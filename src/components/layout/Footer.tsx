@@ -9,8 +9,8 @@ const Footer: React.FC = () => {
           {/* Brand */}
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center space-x-2 mb-4">
-              <div className="p-2 bg-blue-600 rounded-lg">
-                <Heart className="w-6 h-6 text-white" />
+              <div className="p-2 rounded-lg">
+                <img src="/Logo.png" alt="WaitlessOS Logo" className="w-12 h-12" />
               </div>
               <span className="text-xl font-bold">WaitlessOS</span>
             </div>
