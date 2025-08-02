@@ -12,7 +12,7 @@ const Footer: React.FC = () => {
               <div className="p-2 bg-blue-600 rounded-lg">
                 <Heart className="w-6 h-6 text-white" />
               </div>
-              <span className="text-xl font-bold">MediConnect AI</span>
+              <span className="text-xl font-bold">WaitlessOS</span>
             </div>
             <p className="text-white mb-4 max-w-md">
               AI-powered healthcare booking platform that helps you find the right care, 
@@ -48,7 +48,7 @@ const Footer: React.FC = () => {
 
         <div className="border-t border-white mt-8 pt-8 flex flex-col md:flex-row justify-end items-center">
           <p className="text-white/90 text-sm">
-            © 2025 MediConnect AI. All rights reserved.
+            © 2025 WaitlessOS. All rights reserved.
           </p>
         </div>
       </div>

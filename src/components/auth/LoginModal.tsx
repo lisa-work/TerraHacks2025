@@ -50,7 +50,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
           </h2>
           <p className="text-gray-600 text-sm">
             {isSignUp 
-              ? 'Join MediConnect AI to access personalized healthcare'
+              ? 'Join WaitlessOS to access personalized healthcare'
               : 'Sign in to access your healthcare dashboard'
             }
           </p>

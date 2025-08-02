@@ -29,7 +29,7 @@ const LandingPage: React.FC = () => {
               </div>
               
               <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-[#1D6FA3] via-[#3C91E6] to-[#3f7485] bg-clip-text text-transparent drop-shadow-md">
-                Find the Right Care, Right Now
+                Skip The Wait, Start Healing
               </h1>
               
               <p className="text-md lg:text-lg mb-8 leading-relaxed text-[#1E3A5F]">
@@ -113,7 +113,7 @@ const LandingPage: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-[#1D6FA3] via-[#3C91E6] to-[#3f7485] bg-clip-text text-transparent drop-shadow-md mb-4">
-              Why Choose MediConnect AI?
+              Why Choose WaitlessOS?
             </h2>
             <p className="text-lg font-medium text-[#1E3A5F] max-w-3xl mx-auto">
               We've reimagined healthcare booking to be faster, smarter, and more transparent
@@ -251,7 +251,7 @@ const LandingPage: React.FC = () => {
             Ready to Transform Your Healthcare Experience?
           </h2>
           <p className="text-lg text-[#1E3A5F] mb-8">
-            Join thousands of users who've found faster, smarter healthcare with MediConnect AI
+            Join thousands of users who've found faster, smarter healthcare with WaitlessOS
           </p>
           <Link
             to="/symptoms"

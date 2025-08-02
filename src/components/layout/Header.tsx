@@ -24,7 +24,7 @@ const Header: React.FC = () => {
               <div className="p-2 bg-[#1D6FA3]/80 rounded-lg">
                 <Heart className="w-6 h-6 text-white" />
               </div>
-              <span className="text-xl font-bold text-[#1E3A5F]">MediConnect AI</span>
+              <span className="text-xl font-bold text-[#1E3A5F]">WaitlessOS</span>
             </Link>
 
             {/* Desktop Navigation */}
