@@ -21,8 +21,8 @@ const Header: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link to="/" className="flex items-center space-x-2">
-              <div className="p-2 bg-[#1D6FA3]/80 rounded-lg">
-                <Heart className="w-6 h-6 text-white" />
+              <div className="p-2 rounded-lg">
+                <img src="/Logo.png" alt="WaitlessOS Logo" className="w-12 h-12" />
               </div>
               <span className="text-xl font-bold text-[#1E3A5F]">WaitlessOS</span>
             </Link>
