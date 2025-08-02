@@ -12,6 +12,7 @@ import { connectDatabase } from './config/database';
 import { connectRedis } from './config/redis';
 import { errorHandler } from './middleware/errorHandler';
 import { notFoundHandler } from './middleware/notFoundHandler';
+import { serveUploadedFile } from './middleware/upload';
 
 // Routes
 import authRoutes from './routes/auth';
@@ -65,6 +66,9 @@ app.get('/api/health', (req, res) => {
     uptime: process.uptime()
   });
 });
+
+// File serving endpoint for uploaded photos
+app.get('/api/uploads/photos/:filename', serveUploadedFile);
 
 // API Routes
 app.use('/api/auth', authRoutes);

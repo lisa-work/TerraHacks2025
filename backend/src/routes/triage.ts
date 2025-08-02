@@ -4,10 +4,12 @@ import {
   startTriageSession,
   getTriageSession,
   submitTriageFeedback,
-  getTriageHistory
+  getTriageHistory,
+  deleteTriageSession
 } from '../controllers/triageController';
 import { optionalAuth, protect } from '../middleware/auth';
 import { validateRequest } from '../middleware/validation';
+import { uploadMultiple, serveUploadedFile } from '../middleware/upload';
 
 const router = express.Router();
 
@@ -24,6 +26,11 @@ const startTriageValidation = [
     .trim()
     .isLength({ min: 10, max: 2000 })
     .withMessage('Symptom description must be between 10 and 2000 characters'),
+  body('additionalNotes')
+    .optional()
+    .trim()
+    .isLength({ max: 1000 })
+    .withMessage('Additional notes cannot exceed 1000 characters'),
   body('duration')
     .trim()
     .notEmpty()
@@ -63,10 +70,33 @@ const feedbackValidation = [
     .withMessage('Comments cannot exceed 500 characters')
 ];
 
+// Custom middleware to handle photo upload errors
+const handleUploadError = (err: any, req: any, res: any, next: any) => {
+  if (err) {
+    return res.status(400).json({
+      success: false,
+      error: err.message || 'File upload error'
+    });
+  }
+  next();
+};
+
 // Routes
-router.post('/start', optionalAuth, startTriageValidation, validateRequest, startTriageSession);
+router.post('/start', 
+  optionalAuth, 
+  uploadMultiple, 
+  handleUploadError,
+  startTriageValidation, 
+  validateRequest, 
+  startTriageSession
+);
+
 router.get('/session/:sessionId', getTriageSession);
 router.post('/session/:sessionId/feedback', feedbackValidation, validateRequest, submitTriageFeedback);
+router.delete('/session/:sessionId', protect, deleteTriageSession);
 router.get('/history', protect, getTriageHistory);
+
+// Route to serve uploaded photos
+router.get('/photos/:filename', serveUploadedFile);
 
 export default router;

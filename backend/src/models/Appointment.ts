@@ -3,6 +3,7 @@ import mongoose, { Document, Schema } from 'mongoose';
 export interface IAppointment extends Document {
   user: mongoose.Types.ObjectId;
   clinic: mongoose.Types.ObjectId;
+  triageSession?: mongoose.Types.ObjectId; // Reference to triage session
   appointmentDate: Date;
   appointmentTime: string;
   duration: number; // in minutes
@@ -12,6 +13,13 @@ export interface IAppointment extends Document {
   symptoms: string[];
   notes?: string;
   doctorNotes?: string;
+  photos?: Array<{
+    filename: string;
+    originalName: string;
+    description?: string;
+    uploadedAt: Date;
+    fromTriage: boolean; // Indicates if photo came from triage session
+  }>; // Photos attached to appointment
   assignedDoctor?: {
     name: string;
     specialty: string;
@@ -59,6 +67,10 @@ const AppointmentSchema = new Schema<IAppointment>({
     type: Schema.Types.ObjectId,
     ref: 'Clinic',
     required: [true, 'Clinic is required']
+  },
+  triageSession: {
+    type: Schema.Types.ObjectId,
+    ref: 'TriageSession'
   },
   appointmentDate: {
     type: Date,
@@ -110,6 +122,29 @@ const AppointmentSchema = new Schema<IAppointment>({
     trim: true,
     maxlength: [2000, 'Doctor notes cannot exceed 2000 characters']
   },
+  photos: [{
+    filename: {
+      type: String,
+      required: true
+    },
+    originalName: {
+      type: String,
+      required: true
+    },
+    description: {
+      type: String,
+      trim: true,
+      maxlength: [200, 'Photo description cannot exceed 200 characters']
+    },
+    uploadedAt: {
+      type: Date,
+      default: Date.now
+    },
+    fromTriage: {
+      type: Boolean,
+      default: false
+    }
+  }],
   assignedDoctor: {
     name: {
       type: String,
@@ -237,6 +272,7 @@ const AppointmentSchema = new Schema<IAppointment>({
 // Indexes for better performance
 AppointmentSchema.index({ user: 1, appointmentDate: 1 });
 AppointmentSchema.index({ clinic: 1, appointmentDate: 1 });
+AppointmentSchema.index({ triageSession: 1 });
 AppointmentSchema.index({ status: 1 });
 AppointmentSchema.index({ appointmentDate: 1, appointmentTime: 1 });
 AppointmentSchema.index({ type: 1 });

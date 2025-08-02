@@ -5,6 +5,15 @@ export interface ITriageSession extends Document {
   sessionId: string;
   symptoms: string[];
   symptomDescription: string;
+  additionalNotes?: string; // New field for user's additional description
+  photos?: Array<{
+    filename: string;
+    originalName: string;
+    mimetype: string;
+    size: number;
+    uploadedAt: Date;
+    description?: string;
+  }>; // New field for photo uploads
   duration: string;
   severity: number; // 1-10 scale
   location?: {
@@ -33,6 +42,18 @@ export interface ITriageSession extends Document {
     redFlags: string[];
     selfCareAdvice: string[];
     whenToSeekHelp: string[];
+    imageAnalysis?: {
+      hasImages: boolean;
+      findings: Array<{
+        description: string;
+        severity: 'mild' | 'moderate' | 'severe' | 'critical';
+        urgencyImpact: string;
+        recommendations: string[];
+      }>;
+      visualAssessment: string;
+      emergencyIndicators: string[];
+      firstAidInstructions: string[];
+    }; // New field for AI image analysis
   };
   recommendations: {
     careType: 'emergency' | 'urgent_care' | 'primary_care' | 'specialist' | 'telemedicine' | 'self_care';
@@ -85,6 +106,45 @@ const TriageSessionSchema = new Schema<ITriageSession>({
     trim: true,
     maxlength: [2000, 'Symptom description cannot exceed 2000 characters']
   },
+  additionalNotes: {
+    type: String,
+    trim: true,
+    maxlength: [1000, 'Additional notes cannot exceed 1000 characters']
+  },
+  photos: [{
+    filename: {
+      type: String,
+      required: true
+    },
+    originalName: {
+      type: String,
+      required: true
+    },
+    mimetype: {
+      type: String,
+      required: true,
+      validate: {
+        validator: function(value: string) {
+          return /^image\/(jpeg|jpg|png|webp)$/i.test(value);
+        },
+        message: 'Only JPEG, PNG, and WebP images are allowed'
+      }
+    },
+    size: {
+      type: Number,
+      required: true,
+      max: [10485760, 'File size cannot exceed 10MB'] // 10MB limit
+    },
+    uploadedAt: {
+      type: Date,
+      default: Date.now
+    },
+    description: {
+      type: String,
+      trim: true,
+      maxlength: [200, 'Photo description cannot exceed 200 characters']
+    }
+  }],
   duration: {
     type: String,
     required: [true, 'Duration is required'],
@@ -190,7 +250,46 @@ const TriageSessionSchema = new Schema<ITriageSession>({
     whenToSeekHelp: [{
       type: String,
       trim: true
-    }]
+    }],
+    imageAnalysis: {
+      hasImages: {
+        type: Boolean,
+        default: false
+      },
+      findings: [{
+        description: {
+          type: String,
+          required: true,
+          trim: true
+        },
+        severity: {
+          type: String,
+          required: true,
+          enum: ['mild', 'moderate', 'severe', 'critical']
+        },
+        urgencyImpact: {
+          type: String,
+          required: true,
+          trim: true
+        },
+        recommendations: [{
+          type: String,
+          trim: true
+        }]
+      }],
+      visualAssessment: {
+        type: String,
+        trim: true
+      },
+      emergencyIndicators: [{
+        type: String,
+        trim: true
+      }],
+      firstAidInstructions: [{
+        type: String,
+        trim: true
+      }]
+    }
   },
   recommendations: {
     careType: {

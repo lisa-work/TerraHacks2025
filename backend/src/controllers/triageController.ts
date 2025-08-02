@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { v4 as uuidv4 } from 'uuid';
+import path from 'path';
 import TriageSession from '../models/TriageSession';
 import User from '../models/User';
 import Clinic from '../models/Clinic';
@@ -7,8 +8,9 @@ import geminiService from '../services/geminiService';
 import mapsService from '../services/mapsService';
 import { AuthRequest } from '../middleware/auth';
 import { setCache, getCache } from '../config/redis';
+import { deleteUploadedFiles, getFileUrl } from '../middleware/upload';
 
-// @desc    Start new triage session
+// @desc    Start new triage session with photo support
 // @route   POST /api/triage/start
 // @access  Public (can be used without auth)
 export const startTriageSession = async (req: AuthRequest, res: Response, next: NextFunction) => {
@@ -16,6 +18,7 @@ export const startTriageSession = async (req: AuthRequest, res: Response, next: 
     const {
       symptoms,
       symptomDescription,
+      additionalNotes,
       duration,
       severity,
       location,
@@ -24,6 +27,17 @@ export const startTriageSession = async (req: AuthRequest, res: Response, next: 
 
     const sessionId = uuidv4();
     const startTime = Date.now();
+
+    // Handle uploaded photos
+    const uploadedFiles = req.files as Express.Multer.File[] || [];
+    const photos = uploadedFiles.map(file => ({
+      filename: file.filename,
+      originalName: file.originalname,
+      mimetype: file.mimetype,
+      size: file.size,
+      uploadedAt: new Date(),
+      description: req.body[`photo_description_${file.fieldname}`] || undefined
+    }));
 
     // Get user's medical history if authenticated
     let medicalHistory: string[] = [];
@@ -43,6 +57,7 @@ export const startTriageSession = async (req: AuthRequest, res: Response, next: 
     const symptomData = {
       symptoms,
       symptomDescription,
+      additionalNotes,
       duration,
       severity,
       age: patientInfo?.age || (req.user?.dateOfBirth ? 
@@ -53,82 +68,113 @@ export const startTriageSession = async (req: AuthRequest, res: Response, next: 
       allergies: [...allergies, ...(patientInfo?.allergies || [])]
     };
 
-    // Analyze symptoms with Gemini AI
-    const aiAnalysis = await geminiService.analyzeSymptoms(symptomData);
-    const processingTime = Date.now() - startTime;
+    // Prepare photo data for AI analysis
+    const photoData = uploadedFiles.map(file => ({
+      filename: file.filename,
+      originalName: file.originalname,
+      description: req.body[`photo_description_${file.fieldname}`],
+      filePath: file.path
+    }));
 
-    // Generate follow-up questions
-    const followUpQuestions = await geminiService.generateFollowUpQuestions(symptomData, aiAnalysis);
+    try {
+      // Analyze symptoms with Gemini AI (including photos if provided)
+      const aiAnalysis = await geminiService.analyzeSymptoms(symptomData, photoData.length > 0 ? photoData : undefined);
+      const processingTime = Date.now() - startTime;
 
-    // Find nearby clinics based on care type and location
-    let suggestedClinics: any[] = [];
-    if (location) {
-      suggestedClinics = await findNearbyClinicsByType(location, aiAnalysis.careType, aiAnalysis.recommendedSpecialty);
-    }
+      // Generate follow-up questions
+      const followUpQuestions = await geminiService.generateFollowUpQuestions(symptomData, aiAnalysis);
 
-    // Calculate cost estimates
-    const costEstimate = calculateCostEstimate(aiAnalysis.careType, req.user?.insurance);
+      // Find nearby clinics based on care type and location
+      let suggestedClinics: any[] = [];
+      if (location) {
+        suggestedClinics = await findNearbyClinicsByType(location, aiAnalysis.careType, aiAnalysis.recommendedSpecialty);
+      }
 
-    // Create triage session
-    const triageSession = await TriageSession.create({
-      user: req.user?._id,
-      sessionId,
-      symptoms,
-      symptomDescription,
-      duration,
-      severity,
-      location,
-      patientInfo: {
-        age: symptomData.age,
-        gender: symptomData.gender,
-        medicalHistory: symptomData.medicalHistory,
-        currentMedications: symptomData.currentMedications,
-        allergies: symptomData.allergies
-      },
-      aiAnalysis,
-      recommendations: {
-        careType: aiAnalysis.careType,
-        suggestedClinics: suggestedClinics.map(c => c._id),
-        timeframe: aiAnalysis.timeframe,
-        estimatedWaitTime: calculateWaitTime(aiAnalysis.urgency),
-        costEstimate
-      },
-      followUpQuestions,
-      disclaimers: aiAnalysis.disclaimers,
-      confidence: aiAnalysis.confidence,
-      processingTime,
-      isCompleted: true
-    });
+      // Calculate cost estimates
+      const costEstimate = calculateCostEstimate(aiAnalysis.careType, req.user?.insurance);
 
-    // Cache the session for quick access
-    await setCache(`triage_session_${sessionId}`, triageSession, 3600); // 1 hour
-
-    res.status(201).json({
-      success: true,
-      sessionId,
-      triageResult: {
-        urgency: aiAnalysis.urgency,
-        urgencyScore: aiAnalysis.urgencyScore,
-        possibleConditions: aiAnalysis.possibleConditions,
-        recommendedAction: aiAnalysis.recommendedAction,
-        recommendedSpecialty: aiAnalysis.recommendedSpecialty,
-        redFlags: aiAnalysis.redFlags,
-        selfCareAdvice: aiAnalysis.selfCareAdvice,
-        whenToSeekHelp: aiAnalysis.whenToSeekHelp,
+      // Create triage session
+      const triageSession = await TriageSession.create({
+        user: req.user?._id,
+        sessionId,
+        symptoms,
+        symptomDescription,
+        additionalNotes,
+        photos,
+        duration,
+        severity,
+        location,
+        patientInfo: {
+          age: symptomData.age,
+          gender: symptomData.gender,
+          medicalHistory: symptomData.medicalHistory,
+          currentMedications: symptomData.currentMedications,
+          allergies: symptomData.allergies
+        },
+        aiAnalysis,
+        recommendations: {
+          careType: aiAnalysis.careType,
+          suggestedClinics: suggestedClinics.map(c => c._id),
+          timeframe: aiAnalysis.timeframe,
+          estimatedWaitTime: calculateWaitTime(aiAnalysis.urgency),
+          costEstimate
+        },
+        followUpQuestions,
+        disclaimers: aiAnalysis.disclaimers,
         confidence: aiAnalysis.confidence,
-        careType: aiAnalysis.careType,
-        timeframe: aiAnalysis.timeframe,
-        disclaimers: aiAnalysis.disclaimers
-      },
-      recommendations: {
-        suggestedClinics,
-        estimatedWaitTime: calculateWaitTime(aiAnalysis.urgency),
-        costEstimate
-      },
-      followUpQuestions,
-      processingTime
-    });
+        processingTime,
+        isCompleted: true
+      });
+
+      // Cache the session for quick access
+      await setCache(`triage_session_${sessionId}`, triageSession, 3600); // 1 hour
+
+      // Prepare photo URLs for response
+      const photoUrls = photos.map(photo => ({
+        ...photo,
+        url: getFileUrl(photo.filename)
+      }));
+
+      res.status(201).json({
+        success: true,
+        sessionId,
+        triageResult: {
+          urgency: aiAnalysis.urgency,
+          urgencyScore: aiAnalysis.urgencyScore,
+          possibleConditions: aiAnalysis.possibleConditions,
+          recommendedAction: aiAnalysis.recommendedAction,
+          recommendedSpecialty: aiAnalysis.recommendedSpecialty,
+          redFlags: aiAnalysis.redFlags,
+          selfCareAdvice: aiAnalysis.selfCareAdvice,
+          whenToSeekHelp: aiAnalysis.whenToSeekHelp,
+          confidence: aiAnalysis.confidence,
+          careType: aiAnalysis.careType,
+          timeframe: aiAnalysis.timeframe,
+          disclaimers: aiAnalysis.disclaimers,
+          imageAnalysis: aiAnalysis.imageAnalysis
+        },
+        recommendations: {
+          suggestedClinics,
+          estimatedWaitTime: calculateWaitTime(aiAnalysis.urgency),
+          costEstimate
+        },
+        followUpQuestions,
+        photos: photoUrls,
+        processingTime
+      });
+    } catch (aiError) {
+      // If AI analysis fails, clean up uploaded files and return error
+      if (uploadedFiles.length > 0) {
+        deleteUploadedFiles(uploadedFiles.map(f => f.filename));
+      }
+      throw aiError;
+    }
   } catch (error) {
+    // Clean up uploaded files on any error
+    if (req.files) {
+      const files = req.files as Express.Multer.File[];
+      deleteUploadedFiles(files.map(f => f.filename));
+    }
     next(error);
   }
 };
@@ -158,6 +204,14 @@ export const getTriageSession = async (req: Request, res: Response, next: NextFu
 
       // Cache for future requests
       await setCache(`triage_session_${sessionId}`, triageSession, 3600);
+    }
+
+    // Add photo URLs to response
+    if (triageSession.photos) {
+      triageSession.photos = triageSession.photos.map((photo: any) => ({
+        ...photo,
+        url: getFileUrl(photo.filename)
+      }));
     }
 
     res.status(200).json({
@@ -218,11 +272,23 @@ export const getTriageHistory = async (req: AuthRequest, res: Response, next: Ne
       .limit(limit)
       .populate('recommendations.suggestedClinics', 'name address type');
 
+    // Add photo URLs to each session
+    const sessionsWithPhotoUrls = triageSessions.map(session => {
+      const sessionObj = session.toObject();
+      if (sessionObj.photos) {
+        sessionObj.photos = sessionObj.photos.map((photo: any) => ({
+          ...photo,
+          url: getFileUrl(photo.filename)
+        }));
+      }
+      return sessionObj;
+    });
+
     const total = await TriageSession.countDocuments({ user: req.user?._id });
 
     res.status(200).json({
       success: true,
-      triageSessions,
+      triageSessions: sessionsWithPhotoUrls,
       pagination: {
         currentPage: page,
         totalPages: Math.ceil(total / limit),
@@ -235,7 +301,52 @@ export const getTriageHistory = async (req: AuthRequest, res: Response, next: Ne
   }
 };
 
-// Helper functions
+// @desc    Delete triage session and associated photos
+// @route   DELETE /api/triage/session/:sessionId
+// @access  Private
+export const deleteTriageSession = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const { sessionId } = req.params;
+
+    const triageSession = await TriageSession.findOne({ sessionId });
+
+    if (!triageSession) {
+      return res.status(404).json({
+        success: false,
+        error: 'Triage session not found'
+      });
+    }
+
+    // Check if user owns this session
+    if (req.user && triageSession.user && triageSession.user.toString() !== req.user._id.toString()) {
+      return res.status(403).json({
+        success: false,
+        error: 'Not authorized to delete this session'
+      });
+    }
+
+    // Delete associated photos
+    if (triageSession.photos && triageSession.photos.length > 0) {
+      const filenames = triageSession.photos.map(photo => photo.filename);
+      deleteUploadedFiles(filenames);
+    }
+
+    // Delete session from database
+    await TriageSession.findByIdAndDelete(triageSession._id);
+
+    // Remove from cache
+    await setCache(`triage_session_${sessionId}`, null, 1);
+
+    res.status(200).json({
+      success: true,
+      message: 'Triage session deleted successfully'
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Helper functions (keeping existing ones and adding new photo-related logic)
 const findNearbyClinicsByType = async (location: any, careType: string, specialties: string[]) => {
   try {
     const searchRadius = 50000; // 50km
