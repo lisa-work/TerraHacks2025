@@ -277,7 +277,7 @@ const SearchResults: React.FC = () => {
                   <div className="flex space-x-3">
                     <button
                       onClick={() => handleBooking(clinic)}
-                      className="flex-1 bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2"
+                      className="flex-1 bg-[#1D6FA3] text-white py-3 px-4 rounded-lg font-medium hover:bg-[#1D6FA3]/80 transition-colors flex items-center justify-center space-x-2"
                     >
                       <Calendar className="w-4 h-4" />
                       <span>Book Appointment</span>

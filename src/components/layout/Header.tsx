@@ -21,18 +21,18 @@ const Header: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link to="/" className="flex items-center space-x-2">
-              <div className="p-2 bg-blue-600 rounded-lg">
+              <div className="p-2 bg-[#1D6FA3]/80 rounded-lg">
                 <Heart className="w-6 h-6 text-white" />
               </div>
-              <span className="text-xl font-bold text-gray-900">MediConnect AI</span>
+              <span className="text-xl font-bold text-[#1E3A5F]">MediConnect AI</span>
             </Link>
 
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center space-x-6">
-              <Link to="/symptoms" className="text-gray-700 hover:text-blue-600 transition-colors">
+              <Link to="/symptoms" className="text-gray-700 hover:text-[#1D6FA3] hover:font-medium hover:underline hover:underline-offset-2 transition-colors">
                 Find Care
               </Link>
-              <Link to="/emergency" className="text-red-600 hover:text-red-700 font-medium transition-colors">
+              <Link to="/emergency" className="text-red-600 hover:text-red-800 font-bold hover:underline hover:underline-offset-2 transition-colors">
                 Emergency
               </Link>
               
@@ -40,9 +40,8 @@ const Header: React.FC = () => {
                 <div className="flex items-center space-x-4">
                   <Link 
                     to="/dashboard" 
-                    className="flex items-center space-x-1 text-gray-700 hover:text-blue-600 transition-colors"
+                    className="flex items-center space-x-1 text-gray-700 hover:text-[#1D6FA3] hover:underline hover:underline-offset-2 transition-colors"
                   >
-                    <Calendar className="w-4 h-4" />
                     <span>Dashboard</span>
                   </Link>
                   <div className="flex items-center space-x-2">
@@ -60,7 +59,7 @@ const Header: React.FC = () => {
               ) : (
                 <button
                   onClick={() => setIsLoginOpen(true)}
-                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                  className="bg-[#dbf6ff]/80 text-[#1E3A5F] font-medium px-4 py-2 rounded-lg hover:bg-[#8ba1a7] hover:text-white transition-colors"
                 >
                   Sign In
                 </button>
@@ -99,7 +98,7 @@ const Header: React.FC = () => {
                   <>
                     <Link 
                       to="/dashboard" 
-                      className="text-gray-700 hover:text-blue-600 transition-colors py-2"
+                      className="text-gray-700 hover:text-[#1D6FA3] hover:underline hover:underline-offset-2 transition-colors py-2"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       Dashboard

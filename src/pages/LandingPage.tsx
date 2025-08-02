@@ -12,26 +12,27 @@ import {
   Users,
   Award
 } from 'lucide-react';
+import Footer from '../components/layout/Footer';
 
 const LandingPage: React.FC = () => {
   return (
     <div className="min-h-screen">
+
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 text-white py-20">
+      <section className="bg-custom-healthcare text-gray-800 py-20 mx-auto h-full">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
-              <div className="inline-flex items-center bg-blue-500 bg-opacity-20 rounded-full px-4 py-2 mb-6">
+              <div className="inline-flex items-center bg-blue-400 bg-opacity-20 rounded-full px-4 py-2 mb-6">
                 <Zap className="w-4 h-4 mr-2" />
                 <span className="text-sm font-medium">AI-Powered Healthcare</span>
               </div>
               
-              <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-                Find the Right Care,
-                <span className="text-blue-200"> Right Now</span>
+              <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-[#1D6FA3] via-[#3C91E6] to-[#3f7485] bg-clip-text text-transparent drop-shadow-md">
+                Find the Right Care, Right Now
               </h1>
               
-              <p className="text-xl text-blue-100 mb-8 leading-relaxed">
+              <p className="text-md lg:text-lg mb-8 leading-relaxed text-[#1E3A5F]">
                 Skip the guesswork. Our AI analyzes your symptoms, insurance, and location 
                 to connect you with the perfect healthcare provider in seconds.
               </p>
@@ -39,7 +40,7 @@ const LandingPage: React.FC = () => {
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
                   to="/symptoms"
-                  className="inline-flex items-center justify-center bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold hover:bg-gray-50 transition-colors group"
+                  className="inline-flex items-center justify-center bg-white text-[#1E3A5F] px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-colors group"
                 >
                   Find Care Now
                   <ChevronRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -47,23 +48,23 @@ const LandingPage: React.FC = () => {
                 
                 <Link
                   to="/emergency"
-                  className="inline-flex items-center justify-center border-2 border-white text-white px-8 py-4 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors"
+                  className="text-red-600 inline-flex items-center justify-center border-2 border-red-600 px-8 py-4 rounded-lg font-semibold hover:border-gray-100 hover:bg-white hover:text-[#1E3A5F] transition-colors"
                 >
                   Emergency Care
                 </Link>
               </div>
             </div>
             
-            <div className="relative">
-              <div className="bg-white bg-opacity-10 backdrop-blur-sm rounded-2xl p-8 border border-white border-opacity-20">
+            <div className="relative my-auto">
+              <div className="bg-white bg-opacity-25 backdrop-blur-sm rounded-2xl p-8 border border-white border-opacity-20">
                 <div className="space-y-6">
                   <div className="flex items-center space-x-4">
                     <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center">
                       <Heart className="w-6 h-6 text-white" />
                     </div>
                     <div>
-                      <h3 className="font-semibold">Smart Triage</h3>
-                      <p className="text-blue-200 text-sm">AI-powered symptom analysis</p>
+                      <h3 className="font-semibold bg-gradient-to-r from-[#1D6FA3] via-[#3C91E6] to-[#4A63E7] bg-clip-text text-transparent drop-shadow-md">Smart Triage</h3>
+                      <p className="text-gray-600 text-sm">AI-powered symptom analysis</p>
                     </div>
                   </div>
                   
@@ -72,8 +73,8 @@ const LandingPage: React.FC = () => {
                       <MapPin className="w-6 h-6 text-white" />
                     </div>
                     <div>
-                      <h3 className="font-semibold">Location-Based</h3>
-                      <p className="text-blue-200 text-sm">Find nearby providers instantly</p>
+                      <h3 className="font-semibold bg-gradient-to-r from-[#1D6FA3] via-[#3C91E6] to-[#4A63E7] bg-clip-text text-transparent drop-shadow-md">Location-Based</h3>
+                      <p className="text-gray-600 text-sm">Find nearby providers instantly</p>
                     </div>
                   </div>
                   
@@ -82,8 +83,8 @@ const LandingPage: React.FC = () => {
                       <Shield className="w-6 h-6 text-white" />
                     </div>
                     <div>
-                      <h3 className="font-semibold">Insurance Coverage</h3>
-                      <p className="text-blue-200 text-sm">Transparent cost estimates</p>
+                      <h3 className="font-semibold bg-gradient-to-r from-[#1D6FA3] via-[#3C91E6] to-[#4A63E7] bg-clip-text text-transparent drop-shadow-md">Insurance Coverage</h3>
+                      <p className="text-gray-600 text-sm">Transparent cost estimates</p>
                     </div>
                   </div>
                 </div>
@@ -93,14 +94,28 @@ const LandingPage: React.FC = () => {
         </div>
       </section>
 
+      <div className="relative mt-5 shadow-lg">
+        <svg
+          className="absolute bottom-0 left-0 w-full h-32"
+          viewBox="0 0 1440 320"
+          preserveAspectRatio="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            fill="#ffffff"
+            d="M0,160 C120,220 360,80 480,120 C600,160 720,300 840,280 C960,260 1080,120 1200,160 C1320,200 1440,320 1440,320 L0,320 Z"
+          />
+        </svg>
+      </div>
+
       {/* Features Section */}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-[#1D6FA3] via-[#3C91E6] to-[#3f7485] bg-clip-text text-transparent drop-shadow-md mb-4">
               Why Choose MediConnect AI?
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-lg font-medium text-[#1E3A5F] max-w-3xl mx-auto">
               We've reimagined healthcare booking to be faster, smarter, and more transparent
             </p>
           </div>
@@ -138,7 +153,7 @@ const LandingPage: React.FC = () => {
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 bg-gray-50 rounded-2xl p-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 bg-gray-50 rounded-2xl p-8 mb-20">
             <div className="text-center">
               <div className="text-3xl font-bold text-blue-600 mb-2">10,000+</div>
               <div className="text-gray-600">Healthcare Providers</div>
@@ -159,14 +174,28 @@ const LandingPage: React.FC = () => {
         </div>
       </section>
 
+      <div className="relative shadow-lg">
+        <svg
+          className="absolute bottom-0 left-0 w-full h-32"
+          viewBox="0 0 1440 320"
+          preserveAspectRatio="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            fill="#f9fafb"
+            d="M0,160 C120,220 360,80 480,120 C600,160 720,300 840,280 C960,260 1080,120 1200,160 C1320,200 1440,320 1440,320 L0,320 Z"
+          />
+        </svg>
+      </div>
+
       {/* How It Works */}
       <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-[#1D6FA3] via-[#3C91E6] to-[#3f7485] bg-clip-text text-transparent drop-shadow-md mb-4">
               How It Works
             </h2>
-            <p className="text-xl text-gray-600">
+            <p className="text-lg font-medium text-[#1E3A5F]">
               Get the care you need in three simple steps
             </p>
           </div>
@@ -178,11 +207,10 @@ const LandingPage: React.FC = () => {
                   <span className="text-2xl font-bold text-white">1</span>
                 </div>
                 <div className="absolute top-10 left-1/2 transform translate-x-8 hidden md:block">
-                  <ChevronRight className="w-6 h-6 text-gray-400" />
                 </div>
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-4">Describe Your Symptoms</h3>
-              <p className="text-gray-600">
+              <p className="text-gray-600 text-md">
                 Tell us about your symptoms, location, and insurance. Our AI will analyze your needs in seconds.
               </p>
             </div>
@@ -193,11 +221,10 @@ const LandingPage: React.FC = () => {
                   <span className="text-2xl font-bold text-white">2</span>
                 </div>
                 <div className="absolute top-10 left-1/2 transform translate-x-8 hidden md:block">
-                  <ChevronRight className="w-6 h-6 text-gray-400" />
                 </div>
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-4">Get Smart Recommendations</h3>
-              <p className="text-gray-600">
+              <p className="text-gray-600 text-md">
                 Receive personalized provider recommendations with cost estimates and insurance coverage details.
               </p>
             </div>
@@ -209,7 +236,7 @@ const LandingPage: React.FC = () => {
                 </div>
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-4">Book Instantly</h3>
-              <p className="text-gray-600">
+              <p className="text-gray-600 text-md">
                 Choose your preferred provider and book your appointment with real-time availability.
               </p>
             </div>
@@ -218,23 +245,25 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-blue-600">
+      <section className="bg-gradient-to-b from-[#f9fafb] via-[#ffffff] to-[#b9d4dc] py-20">
         <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+          <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-[#1D6FA3] via-[#3C91E6] to-[#3f7485] bg-clip-text text-transparent drop-shadow-md mb-6 ">
             Ready to Transform Your Healthcare Experience?
           </h2>
-          <p className="text-xl text-blue-100 mb-8">
+          <p className="text-lg text-[#1E3A5F] mb-8">
             Join thousands of users who've found faster, smarter healthcare with MediConnect AI
           </p>
           <Link
             to="/symptoms"
-            className="inline-flex items-center bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-50 transition-colors group"
+            className="inline-flex items-center bg-white text-[#1E3A5F] px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-50 transition-colors group"
           >
             Get Started Now
             <ChevronRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
       </section>
+
+      <Footer />
     </div>
   );
 };

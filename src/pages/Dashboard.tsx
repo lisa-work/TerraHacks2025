@@ -75,7 +75,7 @@ const Dashboard: React.FC = () => {
           <User className="w-16 h-16 text-gray-400 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Sign In Required</h2>
           <p className="text-gray-600 mb-6">Please sign in to view your dashboard</p>
-          <button className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
+          <button className="bg-[#1D6FA3]/80 text-white px-6 py-3 rounded-lg hover:bg-[#1D6FA3] transition-colors">
             Sign In
           </button>
         </div>
@@ -100,7 +100,7 @@ const Dashboard: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-3xl font-bold text-[#1E3A5F] mb-2">
             Welcome back, {user?.name}
           </h1>
           <p className="text-gray-600">
@@ -112,8 +112,8 @@ const Dashboard: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center space-x-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Calendar className="w-6 h-6 text-blue-600" />
+              <div className="p-2 bg-[#1D6FA3]/10 rounded-lg">
+                <Calendar className="w-6 h-6 text-[#1D6FA3]" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-gray-900">{upcomingAppointments.length}</p>
@@ -178,7 +178,7 @@ const Dashboard: React.FC = () => {
                         onClick={() => setActiveTab(tab.id)}
                         className={`flex items-center space-x-2 py-4 border-b-2 font-medium text-sm transition-colors ${
                           activeTab === tab.id
-                            ? 'border-blue-600 text-blue-600'
+                            ? 'border-[#1D6FA3] text-[#1D6FA3]'
                             : 'border-transparent text-gray-500 hover:text-gray-700'
                         }`}
                       >
@@ -196,7 +196,7 @@ const Dashboard: React.FC = () => {
                   <div>
                     <div className="flex items-center justify-between mb-6">
                       <h2 className="text-xl font-bold text-gray-900">Upcoming Appointments</h2>
-                      <button className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                      <button className="flex items-center space-x-2 bg-[#1D6FA3] text-white px-4 py-2 rounded-lg hover:bg-[#1D6FA3]/80 transition-colors">
                         <Plus className="w-4 h-4" />
                         <span>Book New</span>
                       </button>
@@ -291,7 +291,7 @@ const Dashboard: React.FC = () => {
                             
                             <div className="text-right">
                               <div className="text-lg font-semibold text-gray-900">${appointment.cost}</div>
-                              <button className="text-sm text-blue-600 hover:text-blue-700">
+                              <button className="text-sm text-[#1D6FA3] hover:text-[#1D6FA3]/80">
                                 View Details
                               </button>
                             </div>
@@ -421,7 +421,7 @@ const Dashboard: React.FC = () => {
                       <span className="text-sm text-gray-600">{upcomingAppointments[0].clinicName}</span>
                     </div>
                   </div>
-                  <button className="w-full mt-4 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                  <button className="w-full mt-4 bg-[#1D6FA3]/80 text-white py-2 rounded-lg hover:bg-[#1D6FA3] transition-colors">
                     View Details
                   </button>
                 </div>
@@ -432,7 +432,7 @@ const Dashboard: React.FC = () => {
                 <h3 className="font-semibold text-gray-900 mb-4">Quick Actions</h3>
                 <div className="space-y-3">
                   <button className="w-full flex items-center space-x-3 p-3 text-left border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-                    <Plus className="w-5 h-5 text-blue-600" />
+                    <Plus className="w-5 h-5 text-[#1D6FA3]" />
                     <span className="text-sm font-medium text-gray-900">Book Appointment</span>
                   </button>
                   <button className="w-full flex items-center space-x-3 p-3 text-left border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">

@@ -158,7 +158,7 @@ const EmergencyMode: React.FC = () => {
             
             <button
               onClick={() => window.open('https://www.redcross.org/get-help/how-to-prepare-for-emergencies/mobile-apps', '_blank')}
-              className="flex items-center justify-center space-x-3 bg-blue-600 text-white p-4 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+              className="flex items-center justify-center space-x-3 bg-[#1D6FA3] text-white p-4 rounded-lg hover:bg-[#1D6FA3]/80 transition-colors font-semibold"
             >
               <Heart className="w-6 h-6" />
               <span>First Aid Guide</span>
@@ -237,7 +237,7 @@ const EmergencyMode: React.FC = () => {
                   <div className="flex space-x-3">
                     <button
                       onClick={() => getDirections(facility.address)}
-                      className="flex-1 bg-blue-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2"
+                      className="flex-1 bg-[#1D6FA3]/80 text-white py-3 px-4 rounded-lg font-semibold hover:bg-[#1D6FA3] transition-colors flex items-center justify-center space-x-2"
                     >
                       <Car className="w-5 h-5" />
                       <span>Get Directions</span>

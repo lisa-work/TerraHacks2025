@@ -30,7 +30,6 @@ function App() {
                 <Route path="/emergency" element={<EmergencyMode />} />
               </Routes>
             </main>
-            <Footer />
           </div>
         </Router>
       </ClinicProvider>

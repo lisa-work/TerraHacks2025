@@ -58,10 +58,10 @@ const SymptomForm: React.FC = () => {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          <h1 className="text-3xl md:text-4xl font-bold text-[#1D6FA3] mb-4">
             Tell Us About Your Health Needs
           </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-lg text-[#374151] max-w-2xl mx-auto">
             Our AI will analyze your symptoms and find the best healthcare providers for your needs
           </p>
         </div>
@@ -74,7 +74,7 @@ const SymptomForm: React.FC = () => {
                 <div
                   className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold ${
                     step <= currentStep
-                      ? 'bg-blue-600 text-white'
+                      ? 'bg-[#1D6FA3]/80 text-white'
                       : 'bg-gray-200 text-gray-500'
                   }`}
                 >
@@ -91,13 +91,13 @@ const SymptomForm: React.FC = () => {
             ))}
           </div>
           <div className="flex justify-center mt-4 space-x-8 text-sm text-gray-600">
-            <span className={currentStep >= 1 ? 'text-blue-600 font-medium' : ''}>
+            <span className={currentStep >= 1 ? 'text-[#1D6FA3] font-medium' : ''}>
               Symptoms
             </span>
-            <span className={currentStep >= 2 ? 'text-blue-600 font-medium' : ''}>
+            <span className={currentStep >= 2 ? 'text-[#1D6FA3] font-medium' : ''}>
               Details
             </span>
-            <span className={currentStep >= 3 ? 'text-blue-600 font-medium' : ''}>
+            <span className={currentStep >= 3 ? 'text-[#1D6FA3] font-medium' : ''}>
               Preferences
             </span>
           </div>
@@ -109,8 +109,8 @@ const SymptomForm: React.FC = () => {
             {currentStep === 1 && (
               <div className="space-y-6">
                 <div className="text-center mb-8">
-                  <Heart className="w-12 h-12 text-blue-600 mx-auto mb-4" />
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                  <Heart className="w-12 h-12 text-[#1D6FA3] mx-auto mb-4" />
+                  <h2 className="text-2xl font-bold text-[#1D6FA3] mb-2">
                     What symptoms are you experiencing?
                   </h2>
                   <p className="text-gray-600">
@@ -119,7 +119,7 @@ const SymptomForm: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-bold text-[#1D6FA3] mb-2">
                     Describe your symptoms
                   </label>
                   <div className="relative">
@@ -142,7 +142,7 @@ const SymptomForm: React.FC = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-bold text-[#1D6FA3] mb-2">
                       How long have you had these symptoms?
                     </label>
                     <select
@@ -162,17 +162,17 @@ const SymptomForm: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-bold text-[#1D6FA3] mb-2">
                       Pain/Discomfort Level (1-10)
                     </label>
-                    <div className="relative">
+                    <div className="relative ">
                       <input
                         type="range"
                         min="1"
                         max="10"
                         value={formData.severity}
                         onChange={(e) => setFormData({ ...formData, severity: parseInt(e.target.value) })}
-                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                        className="w-full h-2 text-[#1D6FA3]/70 bg-gray-200 rounded-lg appearance-none cursor-pointer"
                       />
                       <div className="flex justify-between text-xs text-gray-500 mt-1">
                         <span>Mild</span>
@@ -189,8 +189,8 @@ const SymptomForm: React.FC = () => {
             {currentStep === 2 && (
               <div className="space-y-6">
                 <div className="text-center mb-8">
-                  <MapPin className="w-12 h-12 text-blue-600 mx-auto mb-4" />
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                  <MapPin className="w-12 h-12 text-[#1D6FA3] mx-auto mb-4" />
+                  <h2 className="text-2xl font-bold text-[#1D6FA3] mb-2">
                     Location & Insurance Details
                   </h2>
                   <p className="text-gray-600">
@@ -199,7 +199,7 @@ const SymptomForm: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-bold text-[#1D6FA3] mb-2">
                     Your Location
                   </label>
                   <div className="relative">
@@ -216,7 +216,7 @@ const SymptomForm: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-bold text-[#1D6FA3]  mb-2">
                     Insurance Provider
                   </label>
                   <select
@@ -239,10 +239,10 @@ const SymptomForm: React.FC = () => {
 
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                   <div className="flex items-start space-x-3">
-                    <Shield className="w-5 h-5 text-blue-600 mt-0.5" />
+                    <Shield className="w-5 h-5 text-[#1D6FA3] mt-0.5" />
                     <div>
-                      <h3 className="font-medium text-blue-900">Privacy Protected</h3>
-                      <p className="text-sm text-blue-700 mt-1">
+                      <h3 className="font-bold text-[#1D6FA3]">Privacy Protected</h3>
+                      <p className="text-sm text-[#1D6FA3] mt-1">
                         Your health information is encrypted and HIPAA compliant. We never share 
                         your data without your explicit consent.
                       </p>
@@ -373,7 +373,7 @@ const SymptomForm: React.FC = () => {
                 <button
                   type="button"
                   onClick={nextStep}
-                  className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                  className="inline-flex items-center px-6 py-3 bg-[#1D6FA3]/80 text-white rounded-lg font-medium hover:bg-[#1D6FA3] transition-colors"
                 >
                   Next Step
                   <ChevronRight className="ml-2 w-5 h-5" />

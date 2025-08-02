@@ -45,10 +45,10 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
         </button>
 
         <div className="text-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+          <h2 className="text-2xl font-bold text-[#1D6FA3] mb-2">
             {isSignUp ? 'Create Account' : 'Welcome Back'}
           </h2>
-          <p className="text-gray-600">
+          <p className="text-gray-600 text-sm">
             {isSignUp 
               ? 'Join MediConnect AI to access personalized healthcare'
               : 'Sign in to access your healthcare dashboard'
@@ -113,7 +113,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-[#1D6FA3]/80 text-white py-3 rounded-lg hover:bg-[#1D6FA3] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? 'Please wait...' : (isSignUp ? 'Create Account' : 'Sign In')}
           </button>
@@ -124,7 +124,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
             {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
             <button
               onClick={() => setIsSignUp(!isSignUp)}
-              className="text-blue-600 hover:text-blue-700 font-medium"
+              className="text-[#1D6FA3] hover:text-[#1D6FA3]/80 font-medium underline underline-offset-2"
             >
               {isSignUp ? 'Sign In' : 'Sign Up'}
             </button>

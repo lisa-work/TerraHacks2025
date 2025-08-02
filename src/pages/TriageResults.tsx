@@ -105,12 +105,12 @@ const TriageResults: React.FC = () => {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="relative">
-            <Brain className="w-16 h-16 text-blue-600 mx-auto mb-4 animate-pulse" />
+            <Brain className="w-16 h-16 text-blue-[#1D6FA3] mx-auto mb-4 animate-pulse" />
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+              <div className="w-8 h-8 border-2 border-blue-[#1D6FA3] border-t-transparent rounded-full animate-spin" />
             </div>
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+          <h2 className="text-2xl font-bold text-[#1D6FA3] mb-2">
             AI Analyzing Your Symptoms
           </h2>
           <p className="text-gray-600 max-w-md mx-auto">
@@ -119,15 +119,15 @@ const TriageResults: React.FC = () => {
           </p>
           <div className="mt-6 space-y-2 text-sm text-gray-500">
             <div className="flex items-center justify-center space-x-2">
-              <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" />
+              <div className="w-2 h-2 bg-[#1D6FA3]/80 rounded-full animate-bounce" />
               <span>Analyzing symptom patterns</span>
             </div>
             <div className="flex items-center justify-center space-x-2">
-              <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce animation-delay-200" />
+              <div className="w-2 h-2 bg-[#1D6FA3]/80 rounded-full animate-bounce animation-delay-200" />
               <span>Evaluating severity indicators</span>
             </div>
             <div className="flex items-center justify-center space-x-2">
-              <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce animation-delay-400" />
+              <div className="w-2 h-2 bg-[#1D6FA3]/80 rounded-full animate-bounce animation-delay-400" />
               <span>Generating recommendations</span>
             </div>
           </div>
@@ -147,8 +147,8 @@ const TriageResults: React.FC = () => {
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center mb-4">
-            <Brain className="w-8 h-8 text-blue-600 mr-2" />
-            <span className="text-lg font-medium text-blue-600">AI Analysis Complete</span>
+            <Brain className="w-8 h-8 text-[#1D6FA3] mr-2" />
+            <span className="text-lg font-medium text-[#1D6FA3]">AI Analysis Complete</span>
           </div>
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
             Your Health Assessment
@@ -244,7 +244,7 @@ const TriageResults: React.FC = () => {
           
           <div className="space-y-4">
             <div className="flex items-start space-x-4 p-4 bg-blue-50 rounded-lg">
-              <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
+              <div className="w-8 h-8 bg-[#1D6FA3]/80 text-white rounded-full flex items-center justify-center text-sm font-bold">
                 1
               </div>
               <div>
@@ -283,7 +283,7 @@ const TriageResults: React.FC = () => {
           <div className="mt-6 pt-6 border-t border-gray-200">
             <button
               onClick={() => navigate('/search')}
-              className="w-full bg-blue-600 text-white py-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2"
+              className="w-full bg-[#1D6FA3]/80 text-white py-4 rounded-lg font-semibold hover:bg-[#1D6FA3]/100 transition-colors flex items-center justify-center space-x-2"
             >
               <span>Find Healthcare Providers</span>
               <ChevronRight className="w-5 h-5" />
