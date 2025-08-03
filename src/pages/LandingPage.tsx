@@ -153,11 +153,7 @@ const LandingPage: React.FC = () => {
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 bg-gray-50 rounded-2xl p-8 mb-20">
-            <div className="text-center">
-              <div className="text-3xl font-bold text-blue-600 mb-2">10,000+</div>
-              <div className="text-gray-600">Healthcare Providers</div>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 bg-gray-50 rounded-2xl p-8 mb-20">
             <div className="text-center">
               <div className="text-3xl font-bold text-green-600 mb-2">2 min</div>
               <div className="text-gray-600">Average Booking Time</div>
