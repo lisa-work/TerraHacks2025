@@ -168,8 +168,8 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
       localStorage.setItem('mediconnect_token', data.token);
       setUser(data.user);
-    } catch (error: any) {
-      setError(error.message);
+    } catch (error) {
+      setError((error as Error).message);
       throw error;
     } finally {
       setLoading(false);
@@ -197,8 +197,8 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
       localStorage.setItem('mediconnect_token', data.token);
       setUser(data.user);
-    } catch (error: any) {
-      setError(error.message);
+    } catch (error) {
+      setError((error as Error).message);
       throw error;
     } finally {
       setLoading(false);
@@ -226,9 +226,9 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         throw new Error(data.error || 'Update failed');
       }
 
-      setUser(data.data);
-    } catch (error: any) {
-      setError(error.message);
+      setUser(data.user);
+    } catch (error) {
+      setError((error as Error).message);
       throw error;
     } finally {
       setLoading(false);
