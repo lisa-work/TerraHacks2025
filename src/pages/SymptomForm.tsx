@@ -48,7 +48,7 @@ interface InsuranceProvider {
 
 const SymptomForm: React.FC = () => {
   const navigate = useNavigate();
-  const { user } = useUser();
+  const { user, updateUser } = useUser();
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<FormData>({
     symptoms: '',
@@ -139,7 +139,9 @@ const SymptomForm: React.FC = () => {
             }));
           }
         } catch (err) {
-          console.error('Failed to geocode address', err);
+          if (!(err instanceof DOMException && err.name === 'AbortError')) {
+            console.error('Failed to geocode address', err);
+          }
         }
       }
     }, 500);
@@ -254,7 +256,24 @@ const SymptomForm: React.FC = () => {
         uploadedImageIds,
         userId: user?._id
       };
-      
+
+      if (user) {
+        try {
+          await updateUser({
+            location: {
+              address: formData.location,
+              lat: formData.coordinates?.lat || 0,
+              lng: formData.coordinates?.lng || 0
+            },
+            insurance: {
+              provider: formData.insurance
+            }
+          });
+        } catch (err) {
+          console.error('Failed to update profile', err);
+        }
+      }
+
       sessionStorage.setItem('symptomData', JSON.stringify(submissionData));
       navigate('/triage');
     } catch (error) {

@@ -1,20 +1,19 @@
-import React, { useState } from 'react';
-import { 
-  Calendar, 
-  Clock, 
-  MapPin, 
-  Phone, 
-  Star, 
+import React, { useState, useEffect } from 'react';
+import {
+  Calendar,
+  Clock,
+  MapPin,
+  Star,
   User,
   Bell,
   Settings,
   CreditCard,
   FileText,
   ChevronRight,
-  Plus,
-  Filter
+  Plus
 } from 'lucide-react';
 import { useUser } from '../contexts/UserContext';
+import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
 
 interface Appointment {
@@ -30,8 +29,42 @@ interface Appointment {
 }
 
 const Dashboard: React.FC = () => {
-  const { user, isAuthenticated } = useUser();
+  const { user, isAuthenticated, updateUser } = useUser();
   const [activeTab, setActiveTab] = useState('appointments');
+  const [profile, setProfile] = useState({
+    name: user?.name || '',
+    email: user?.email || '',
+    phone: user?.phone || '',
+    location: user?.location?.address || '',
+    insuranceProvider: user?.insurance?.provider || '',
+    policyNumber: user?.insurance?.policyNumber || ''
+  });
+
+  useEffect(() => {
+    setProfile({
+      name: user?.name || '',
+      email: user?.email || '',
+      phone: user?.phone || '',
+      location: user?.location?.address || '',
+      insuranceProvider: user?.insurance?.provider || '',
+      policyNumber: user?.insurance?.policyNumber || ''
+    });
+  }, [user]);
+
+  const handleSaveProfile = async () => {
+    try {
+      await updateUser({
+        name: profile.name,
+        phone: profile.phone,
+        location: { ...user?.location, address: profile.location },
+        insurance: { ...user?.insurance, provider: profile.insuranceProvider, policyNumber: profile.policyNumber }
+      });
+      toast.success('Profile updated');
+    } catch (error) {
+      console.error(error);
+      toast.error('Failed to update profile');
+    }
+  };
 
   const mockAppointments: Appointment[] = [
     {
@@ -313,38 +346,38 @@ const Dashboard: React.FC = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                            <input 
-                              type="text" 
-                              value={user?.name || ''} 
+                            <input
+                              type="text"
+                              value={profile.name}
+                              onChange={(e) => setProfile({ ...profile, name: e.target.value })}
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                              readOnly
                             />
                           </div>
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                            <input 
-                              type="email" 
-                              value={user?.email || ''} 
+                            <input
+                              type="email"
+                              value={profile.email}
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                               readOnly
                             />
                           </div>
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-                            <input 
-                              type="tel" 
-                              value={user?.phone || ''} 
+                            <input
+                              type="tel"
+                              value={profile.phone}
+                              onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                              readOnly
                             />
                           </div>
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
-                            <input 
-                              type="text" 
-                              value={user?.location.address || ''} 
+                            <input
+                              type="text"
+                              value={profile.location}
+                              onChange={(e) => setProfile({ ...profile, location: e.target.value })}
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                              readOnly
                             />
                           </div>
                         </div>
@@ -355,20 +388,20 @@ const Dashboard: React.FC = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Provider</label>
-                            <input 
-                              type="text" 
-                              value={user?.insurance.provider || ''} 
+                            <input
+                              type="text"
+                              value={profile.insuranceProvider}
+                              onChange={(e) => setProfile({ ...profile, insuranceProvider: e.target.value })}
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                              readOnly
                             />
                           </div>
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Policy Number</label>
-                            <input 
-                              type="text" 
-                              value={user?.insurance.policyNumber || ''} 
+                            <input
+                              type="text"
+                              value={profile.policyNumber}
+                              onChange={(e) => setProfile({ ...profile, policyNumber: e.target.value })}
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                              readOnly
                             />
                           </div>
                         </div>
@@ -383,7 +416,16 @@ const Dashboard: React.FC = () => {
                           </label>
                         </div>
                       </div>
-                    </div>
+
+                      <div className="text-right">
+                        <button
+                          onClick={handleSaveProfile}
+                          className="mt-4 bg-[#1D6FA3]/80 text-white px-4 py-2 rounded-lg hover:bg-[#1D6FA3] transition-colors"
+                        >
+                          Save Changes
+                        </button>
+                      </div>
+                      </div>
                   </div>
                 )}
               </div>

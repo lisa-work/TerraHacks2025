@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { 
+import {
   Calendar, 
   Clock, 
   MapPin, 
@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { useClinics } from '../contexts/ClinicContext';
 import { useUser } from '../contexts/UserContext';
+import { toast } from 'react-toastify';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
 
@@ -25,6 +26,8 @@ const BookingPage: React.FC = () => {
   const navigate = useNavigate();
   const { clinics, selectedClinic } = useClinics();
   const { user, isAuthenticated } = useUser();
+  const symptomData = sessionStorage.getItem('symptomData');
+  const selectedInsurance = user?.insurance?.provider || (symptomData ? JSON.parse(symptomData).insurance : '');
   
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedTime, setSelectedTime] = useState('');
@@ -62,7 +65,7 @@ const BookingPage: React.FC = () => {
   const handleBooking = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isAuthenticated) {
-      alert('Please sign in to book an appointment');
+      toast.error('Please sign in to book an appointment');
       return;
     }
 
@@ -92,7 +95,7 @@ const BookingPage: React.FC = () => {
       setBookingComplete(true);
     } catch (err) {
       console.error('Booking failed', err);
-      alert('Failed to book appointment');
+      toast.error('Failed to book appointment');
     } finally {
       setIsBooking(false);
     }
@@ -344,7 +347,7 @@ const BookingPage: React.FC = () => {
                       <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
                         <CreditCard className="w-5 h-5 text-gray-400" />
                         <div>
-                          <div className="font-medium text-gray-900">{user.insurance.provider}</div>
+                          <div className="font-medium text-gray-900">{selectedInsurance}</div>
                           <div className="text-sm text-gray-500">Insurance</div>
                         </div>
                       </div>
