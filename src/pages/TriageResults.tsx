@@ -18,6 +18,12 @@ interface TriageResult {
   careType: string;
   timeframe: string;
   confidence: number;
+  selfCare: string;
+}
+
+interface SymptomData {
+  symptoms: string;
+  severity: number;
 }
 
 const TriageResults: React.FC = () => {
@@ -44,7 +50,8 @@ const TriageResults: React.FC = () => {
         reasoning: getReasoning(data),
         careType: getCareType(inferredUrgency),
         timeframe: getTimeframe(inferredUrgency),
-        confidence: 89
+        confidence: 89,
+        selfCare: getSelfCareAdvice(data)
       };
 
       setTriageResult(mockResult);
@@ -52,7 +59,7 @@ const TriageResults: React.FC = () => {
     }, 3000);
   }, [navigate]);
 
-  const determineUrgency = (data: any): 'emergency' | 'urgent' | 'routine' => {
+  const determineUrgency = (data: SymptomData): 'emergency' | 'urgent' | 'routine' => {
     const symptoms = data.symptoms.toLowerCase();
     if (symptoms.includes('chest pain') || symptoms.includes('difficulty breathing')) {
       return 'emergency';
@@ -73,7 +80,7 @@ const TriageResults: React.FC = () => {
     }
   };
 
-  const getReasoning = (data: any): string => {
+  const getReasoning = (data: SymptomData): string => {
     const symptoms = data.symptoms.toLowerCase();
     if (symptoms.includes('chest pain') || symptoms.includes('difficulty breathing')) {
       return 'Symptoms suggest potential cardiovascular or respiratory issues that require immediate attention.';
@@ -94,6 +101,23 @@ const TriageResults: React.FC = () => {
     if (urgency === 'emergency') return 'Immediate';
     if (urgency === 'urgent') return 'Within 24 hours';
     return 'Within 1-2 weeks';
+  };
+
+  const getSelfCareAdvice = (data: SymptomData): string => {
+    const symptoms = data.symptoms.toLowerCase();
+    if (symptoms.includes('cut') || symptoms.includes('bleeding')) {
+      return 'Clean the wound with running water, apply gentle pressure to stop bleeding, and cover with a sterile bandage. Seek medical care if the cut is deep or does not stop bleeding.';
+    }
+    if (symptoms.includes('sprain') || symptoms.includes('swelling')) {
+      return 'Rest the injured area, apply ice wrapped in a cloth for 20 minutes, compress with an elastic bandage, and keep it elevated.';
+    }
+    if (symptoms.includes('fever')) {
+      return 'Stay hydrated, rest, and consider an over-the-counter fever reducer such as acetaminophen. Seek medical care if the fever is high or persistent.';
+    }
+    if (symptoms.includes('headache')) {
+      return 'Rest in a quiet, dark room and stay hydrated. Over-the-counter pain relief may help.';
+    }
+    return 'Rest, monitor your symptoms, and seek medical care if they worsen or do not improve.';
   };
 
   const getUrgencyColor = (urgency: string) => {
@@ -222,6 +246,15 @@ const TriageResults: React.FC = () => {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Self-Care Advice */}
+        <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
+          <h3 className="text-xl font-bold text-gray-900 mb-2 flex items-center space-x-2">
+            <Shield className="w-6 h-6 text-[#1D6FA3]" />
+            <span>Self-Care Suggestions</span>
+          </h3>
+          <p className="text-gray-700">{triageResult.selfCare}</p>
         </div>
 
         {/* Emergency Actions */}

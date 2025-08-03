@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  MapPin, 
-  Star, 
-  Clock, 
-  Phone, 
-  Shield, 
+import {
+  MapPin,
+  Star,
+  Phone,
+  Shield,
   Filter,
   ChevronDown,
   Navigation,
@@ -33,6 +32,7 @@ const SearchResults: React.FC = () => {
       const data = JSON.parse(symptomData);
       searchClinics({
         location: data.location,
+        userLocation: data.coordinates,
         specialty: 'any',
         insurance: data.insurance,
         urgency: data.urgency,

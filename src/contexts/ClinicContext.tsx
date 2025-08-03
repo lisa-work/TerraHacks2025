@@ -32,6 +32,7 @@ interface ClinicContextType {
 
 interface SearchFilters {
   location: string;
+  userLocation?: { lat: number; lng: number };
   specialty: string;
   insurance: string;
   urgency: 'emergency' | 'urgent' | 'routine';
@@ -103,7 +104,25 @@ export const ClinicProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   const [selectedClinic, setSelectedClinic] = useState<Clinic | null>(null);
 
   const searchClinics = (filters: SearchFilters) => {
-    let filtered = [...clinics];
+    // Recalculate distances based on user's location if provided
+    const processed = clinics.map(clinic => {
+      let distance = clinic.distance;
+      if (filters.userLocation) {
+        const toRad = (value: number) => (value * Math.PI) / 180;
+        const R = 3958.8; // Earth radius in miles
+        const dLat = toRad(clinic.location.lat - filters.userLocation.lat);
+        const dLng = toRad(clinic.location.lng - filters.userLocation.lng);
+        const a = Math.sin(dLat / 2) ** 2 +
+          Math.cos(toRad(filters.userLocation.lat)) *
+          Math.cos(toRad(clinic.location.lat)) *
+          Math.sin(dLng / 2) ** 2;
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        distance = parseFloat((R * c).toFixed(1));
+      }
+      return { ...clinic, distance };
+    });
+
+    let filtered = [...processed];
 
     // Filter by specialty
     if (filters.specialty && filters.specialty !== 'any') {
