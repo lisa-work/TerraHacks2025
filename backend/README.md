@@ -61,7 +61,7 @@ A comprehensive Node.js/Express backend for the MediConnect AI healthcare bookin
    
    # Google Services
    GOOGLE_MAPS_API_KEY=your-google-maps-api-key
-   GEMINI_API_KEY=your-gemini-api-key
+   GEMINI_API_KEY=your-gemini-api-key # Optional - backend uses fallback responses if unset
    
    # Email Configuration
    EMAIL_HOST=smtp.gmail.com

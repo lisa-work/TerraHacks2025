@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenerativeAI, GenerativeModel } from '@google/generative-ai';
 
 interface SymptomData {
   symptoms: string[];
@@ -33,29 +33,36 @@ interface TriageResult {
 }
 
 class GeminiService {
-  private genAI: GoogleGenerativeAI;
-  private model: any;
+  private genAI?: GoogleGenerativeAI;
+  private model?: GenerativeModel;
+  private isConfigured = false;
 
   constructor() {
     if (!process.env.GEMINI_API_KEY) {
-      throw new Error('GEMINI_API_KEY environment variable is required');
+      console.warn('GEMINI_API_KEY environment variable is not set. Using fallback responses.');
+      return;
     }
-    
+
     this.genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     this.model = this.genAI.getGenerativeModel({ model: "gemini-pro" });
+    this.isConfigured = true;
   }
 
   async analyzeSymptoms(symptomData: SymptomData): Promise<TriageResult> {
+    if (!this.isConfigured || !this.model) {
+      return this.getFallbackResult();
+    }
+
     try {
       const prompt = this.buildTriagePrompt(symptomData);
       const result = await this.model.generateContent(prompt);
       const response = await result.response;
       const text = response.text();
-      
+
       return this.parseTriageResponse(text);
     } catch (error) {
       console.error('Gemini API error:', error);
-      throw new Error('Failed to analyze symptoms with AI');
+      return this.getFallbackResult();
     }
   }
 
@@ -183,10 +190,41 @@ Provide a thorough but concise analysis focusing on patient safety.
     }
   }
 
+  private getFallbackResult(): TriageResult {
+    return {
+      urgency: 'urgent',
+      urgencyScore: 70,
+      possibleConditions: [
+        {
+          condition: 'Unable to determine',
+          probability: 50,
+          severity: 'moderate',
+          description: 'AI analysis was inconclusive. Please consult with a healthcare professional.'
+        }
+      ],
+      recommendedAction: 'Consult with a healthcare professional for proper evaluation',
+      recommendedSpecialty: ['General Medicine'],
+      redFlags: ['Any worsening of symptoms'],
+      selfCareAdvice: ['Monitor symptoms closely', 'Rest and stay hydrated'],
+      whenToSeekHelp: ['If symptoms worsen or persist'],
+      confidence: 30,
+      careType: 'primary_care',
+      timeframe: 'within 24-48 hours',
+      disclaimers: [
+        'This assessment is for informational purposes only',
+        'AI analysis was inconclusive - please consult with healthcare professionals',
+        'Seek immediate medical attention if symptoms worsen'
+      ]
+    };
+  }
+
   async generateFollowUpQuestions(symptomData: SymptomData, triageResult: TriageResult): Promise<Array<{
     question: string;
     importance: 'high' | 'medium' | 'low';
   }>> {
+    if (!this.isConfigured || !this.model) {
+      return [];
+    }
     try {
       const prompt = `
 Based on the following symptom analysis, generate 3-5 relevant follow-up questions to gather more information:
