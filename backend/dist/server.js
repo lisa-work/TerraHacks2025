@@ -18,6 +18,7 @@ const database_1 = require("./config/database");
 const redis_1 = require("./config/redis");
 const errorHandler_1 = require("./middleware/errorHandler");
 const notFoundHandler_1 = require("./middleware/notFoundHandler");
+const seedData_1 = require("./utils/seedData");
 const auth_1 = __importDefault(require("./routes/auth"));
 const user_1 = __importDefault(require("./routes/user"));
 const clinic_1 = __importDefault(require("./routes/clinic"));
@@ -25,6 +26,8 @@ const appointment_1 = __importDefault(require("./routes/appointment"));
 const triage_1 = __importDefault(require("./routes/triage"));
 const medicalHistory_1 = __importDefault(require("./routes/medicalHistory"));
 const notification_1 = __importDefault(require("./routes/notification"));
+const insurance_1 = __importDefault(require("./routes/insurance"));
+const upload_1 = __importDefault(require("./routes/upload"));
 dotenv_1.default.config({ path: path_1.default.resolve(__dirname, '../.env') });
 const googleMapsApiKey = process.env.GOOGLE_MAPS_API_KEY;
 if (googleMapsApiKey) {
@@ -74,6 +77,8 @@ app.use('/api/appointments', appointment_1.default);
 app.use('/api/triage', triage_1.default);
 app.use('/api/medical-history', medicalHistory_1.default);
 app.use('/api/notifications', notification_1.default);
+app.use('/api/insurance', insurance_1.default);
+app.use('/api/upload', upload_1.default);
 io.on('connection', (socket) => {
     console.log('User connected:', socket.id);
     socket.on('join-user-room', (userId) => {
@@ -91,6 +96,7 @@ const startServer = async () => {
     try {
         await (0, database_1.connectDatabase)();
         await (0, redis_1.connectRedis)();
+        await (0, seedData_1.seedInsuranceProviders)();
         const environment = process.env.NODE_ENV || 'development';
         const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
         server.listen(PORT, () => {

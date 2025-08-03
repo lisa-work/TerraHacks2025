@@ -34,28 +34,36 @@ const registerValidation = [
   body('phone')
     .isMobilePhone('any')
     .withMessage('Please provide a valid phone number'),
+  // Make location fields optional
   body('location.lat')
+    .optional()
     .isFloat({ min: -90, max: 90 })
     .withMessage('Latitude must be between -90 and 90'),
   body('location.lng')
+    .optional()
     .isFloat({ min: -180, max: 180 })
     .withMessage('Longitude must be between -180 and 180'),
   body('location.address')
+    .optional()
     .trim()
     .notEmpty()
-    .withMessage('Address is required'),
+    .withMessage('Address cannot be empty if provided'),
+  // Make insurance fields optional
   body('insurance.provider')
+    .optional()
     .trim()
     .notEmpty()
-    .withMessage('Insurance provider is required'),
+    .withMessage('Insurance provider cannot be empty if provided'),
   body('insurance.policyNumber')
+    .optional()
     .trim()
     .notEmpty()
-    .withMessage('Policy number is required'),
+    .withMessage('Policy number cannot be empty if provided'),
   body('insurance.groupNumber')
+    .optional()
     .trim()
     .notEmpty()
-    .withMessage('Group number is required')
+    .withMessage('Group number cannot be empty if provided')
 ];
 
 const loginValidation = [
