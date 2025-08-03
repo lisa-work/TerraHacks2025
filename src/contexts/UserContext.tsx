@@ -131,7 +131,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
       if (response.ok) {
         const data = await response.json();
-        setUser(data.data);
+        setUser(data.user);
       } else {
         localStorage.removeItem('mediconnect_token');
       }

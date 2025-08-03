@@ -33,6 +33,24 @@ const EmergencyMode: React.FC = () => {
   const [emergencyFacilities, setEmergencyFacilities] = useState<EmergencyFacility[]>([]);
 
   useEffect(() => {
+    const fallback = { lat: 43.6532, lng: -79.3832 }; // Toronto, ON
+
+    const fetchFacilities = async (coords: { lat: number; lng: number }) => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/location/emergency?lat=${coords.lat}&lng=${coords.lng}`);
+        if (!response.ok) {
+          console.error('Emergency facilities request failed:', response.status);
+          return;
+        }
+        const data = await response.json();
+        if (data.success) {
+          setEmergencyFacilities(data.facilities);
+        }
+      } catch (err) {
+        console.error('Failed to fetch emergency facilities', err);
+      }
+    };
+
     // Get user's current location
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -42,28 +60,19 @@ const EmergencyMode: React.FC = () => {
             lng: position.coords.longitude
           };
           setUserLocation(coords);
-
-          try {
-            const response = await fetch(`${API_BASE_URL}/location/emergency?lat=${coords.lat}&lng=${coords.lng}`);
-            if (!response.ok) {
-              console.error('Emergency facilities request failed:', response.status);
-              return;
-            }
-            const data = await response.json();
-            if (data.success) {
-              setEmergencyFacilities(data.facilities);
-            }
-          } catch (err) {
-            console.error('Failed to fetch emergency facilities', err);
-          }
+          fetchFacilities(coords);
         },
         (error) => {
           setLocationError('Unable to get your location.');
           console.error('Geolocation error:', error);
+          setUserLocation(fallback);
+          fetchFacilities(fallback);
         }
       );
     } else {
       setLocationError('Geolocation is not supported by this browser.');
+      setUserLocation(fallback);
+      fetchFacilities(fallback);
     }
   }, []);
 
@@ -203,19 +212,21 @@ const EmergencyMode: React.FC = () => {
                         </div>
                       </div>
 
-                      <div className="mb-4">
-                        <h4 className="text-sm font-medium text-gray-700 mb-2">Specialties:</h4>
-                        <div className="flex flex-wrap gap-2">
-                          {facility.specialties.map((specialty, index) => (
-                            <span 
-                              key={index}
-                              className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full"
-                            >
-                              {specialty}
-                            </span>
-                          ))}
+                      {facility.specialties.length > 0 && (
+                        <div className="mb-4">
+                          <h4 className="text-sm font-medium text-gray-700 mb-2">Specialties:</h4>
+                          <div className="flex flex-wrap gap-2">
+                            {facility.specialties.map((specialty, index) => (
+                              <span
+                                key={index}
+                                className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full"
+                              >
+                                {specialty}
+                              </span>
+                            ))}
+                          </div>
                         </div>
-                      </div>
+                      )}
                     </div>
                   </div>
 

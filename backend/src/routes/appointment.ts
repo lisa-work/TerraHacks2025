@@ -1,14 +1,10 @@
 import express from 'express';
 import { protect } from '../middleware/auth';
+import { createAppointment } from '../controllers/appointmentController';
 
 const router = express.Router();
 
-// Placeholder routes - these would be implemented with full appointment functionality
-router.get('/', protect, (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: 'Appointment routes - to be implemented'
-  });
-});
+// Create a new appointment
+router.post('/', protect, createAppointment);
 
 export default router;
