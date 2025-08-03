@@ -304,7 +304,6 @@ const UserSchema = new mongoose_1.Schema({
         }
     }
 });
-UserSchema.index({ email: 1 });
 UserSchema.index({ phone: 1 });
 UserSchema.index({ 'location.lat': 1, 'location.lng': 1 });
 UserSchema.index({ createdAt: -1 });

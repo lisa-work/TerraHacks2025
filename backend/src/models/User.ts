@@ -349,7 +349,6 @@ const UserSchema = new Schema<IUser>({
 });
 
 // Indexes for better performance
-UserSchema.index({ email: 1 });
 UserSchema.index({ phone: 1 });
 UserSchema.index({ 'location.lat': 1, 'location.lng': 1 });
 UserSchema.index({ createdAt: -1 });

@@ -25,7 +25,12 @@ import notificationRoutes from './routes/notification';
 
 // Load environment variables
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
-console.log('Loaded GOOGLE_MAPS_API_KEY:', process.env.GOOGLE_MAPS_API_KEY);
+const googleMapsApiKey = process.env.GOOGLE_MAPS_API_KEY;
+if (googleMapsApiKey) {
+  console.log('GOOGLE_MAPS_API_KEY loaded');
+} else {
+  console.warn('GOOGLE_MAPS_API_KEY environment variable is not set. Maps features will be disabled.');
+}
 
 const app = express();
 const server = createServer(app);
@@ -105,10 +110,12 @@ const startServer = async () => {
     await connectDatabase();
     await connectRedis();
     
+    const environment = process.env.NODE_ENV || 'development';
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
     server.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
-      console.log(`📊 Environment: ${process.env.NODE_ENV}`);
-      console.log(`🔗 Frontend URL: ${process.env.FRONTEND_URL}`);
+      console.log(`📊 Environment: ${environment}`);
+      console.log(`🔗 Frontend URL: ${frontendUrl}`);
     });
   } catch (error) {
     console.error('❌ Failed to start server:', error);
