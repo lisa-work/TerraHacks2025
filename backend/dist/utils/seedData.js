@@ -13,7 +13,7 @@ const sampleInsuranceProviders = [
         states: ['AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA', 'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY'],
         planTypes: ['HMO', 'PPO', 'EPO', 'POS'],
         contactInfo: {
-            phone: '1-800-810-BLUE',
+            phone: '1-800-810-2583',
             website: 'https://www.bcbs.com',
             customerService: '1-800-810-2583'
         },
