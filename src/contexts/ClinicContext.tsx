@@ -36,6 +36,7 @@ interface SearchFilters {
   insurance: string;
   urgency: 'emergency' | 'urgent' | 'routine';
   maxDistance: number;
+  minRating: number;
 }
 
 const ClinicContext = createContext<ClinicContextType | undefined>(undefined);
@@ -118,9 +119,21 @@ export const ClinicProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     if (filters.urgency === 'emergency') {
       filtered = filtered.filter(clinic => clinic.emergencyServices);
     } else if (filters.urgency === 'urgent') {
-      filtered = filtered.filter(clinic => 
+      filtered = filtered.filter(clinic =>
         clinic.type === 'urgent_care' || clinic.emergencyServices
       );
+    }
+
+    // Filter by insurance
+    if (filters.insurance && filters.insurance !== 'any') {
+      filtered = filtered.filter(clinic =>
+        clinic.insuranceAccepted.includes(filters.insurance)
+      );
+    }
+
+    // Filter by rating
+    if (filters.minRating && filters.minRating > 0) {
+      filtered = filtered.filter(clinic => clinic.rating >= filters.minRating);
     }
 
     // Filter by distance
