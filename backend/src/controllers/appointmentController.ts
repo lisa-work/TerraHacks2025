@@ -1,4 +1,5 @@
 import { Response, NextFunction } from 'express';
+import mongoose from 'mongoose';
 import Appointment from '../models/Appointment';
 import { AuthRequest } from '../middleware/auth';
 
@@ -6,9 +7,13 @@ export const createAppointment = async (req: AuthRequest, res: Response, next: N
   try {
     const { clinicId, appointmentDate, appointmentTime, type, notes } = req.body;
 
+    const clinicObjectId = mongoose.Types.ObjectId.isValid(clinicId)
+      ? new mongoose.Types.ObjectId(clinicId)
+      : new mongoose.Types.ObjectId();
+
     const appointment = await Appointment.create({
       user: req.user!._id,
-      clinic: clinicId,
+      clinic: clinicObjectId,
       appointmentDate,
       appointmentTime,
       duration: 30,
