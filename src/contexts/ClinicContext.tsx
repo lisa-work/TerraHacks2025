@@ -197,6 +197,11 @@ export const ClinicProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     // Sort by distance
     filtered.sort((a, b) => a.distance - b.distance);
 
+    // Ensure at least 5 providers are available
+    if (filtered.length === 0) {
+      filtered = processed.slice(0, 5);
+    }
+
     setFilteredClinics(filtered);
   }, [clinics]);
 

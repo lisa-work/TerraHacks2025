@@ -44,6 +44,11 @@ const TriageResults: React.FC = () => {
     // Mock AI triage analysis based on symptoms
     setTimeout(() => {
       const inferredUrgency = determineUrgency(data);
+
+      // Update stored symptom data with AI-assessed urgency
+      data.urgency = inferredUrgency;
+      sessionStorage.setItem('symptomData', JSON.stringify(data));
+
       const mockResult: TriageResult = {
         urgency: inferredUrgency,
         recommendation: getRecommendation(inferredUrgency),
