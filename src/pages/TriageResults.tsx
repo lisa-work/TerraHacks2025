@@ -34,27 +34,39 @@ const TriageResults: React.FC = () => {
     }
 
     const data = JSON.parse(symptomData);
-    
+
     // Mock AI triage analysis based on symptoms
     setTimeout(() => {
+      const inferredUrgency = determineUrgency(data);
       const mockResult: TriageResult = {
-        urgency: data.urgency,
-        recommendation: getRecommendation(data),
+        urgency: inferredUrgency,
+        recommendation: getRecommendation(inferredUrgency),
         reasoning: getReasoning(data),
-        careType: getCareType(data),
-        timeframe: getTimeframe(data),
+        careType: getCareType(inferredUrgency),
+        timeframe: getTimeframe(inferredUrgency),
         confidence: 89
       };
-      
+
       setTriageResult(mockResult);
       setLoading(false);
     }, 3000);
   }, [navigate]);
 
-  const getRecommendation = (data: any): string => {
-    if (data.severity >= 8 || data.urgency === 'emergency') {
+  const determineUrgency = (data: any): 'emergency' | 'urgent' | 'routine' => {
+    const symptoms = data.symptoms.toLowerCase();
+    if (symptoms.includes('chest pain') || symptoms.includes('difficulty breathing')) {
+      return 'emergency';
+    }
+    if (data.severity >= 7) {
+      return 'urgent';
+    }
+    return 'routine';
+  };
+
+  const getRecommendation = (urgency: string): string => {
+    if (urgency === 'emergency') {
       return 'Seek immediate emergency care';
-    } else if (data.severity >= 6 || data.urgency === 'urgent') {
+    } else if (urgency === 'urgent') {
       return 'Visit urgent care within 24 hours';
     } else {
       return 'Schedule routine appointment with primary care';
@@ -72,15 +84,15 @@ const TriageResults: React.FC = () => {
     }
   };
 
-  const getCareType = (data: any): string => {
-    if (data.urgency === 'emergency') return 'Emergency Room';
-    if (data.urgency === 'urgent') return 'Urgent Care Center';
+  const getCareType = (urgency: string): string => {
+    if (urgency === 'emergency') return 'Emergency Room';
+    if (urgency === 'urgent') return 'Urgent Care Center';
     return 'Primary Care Clinic';
   };
 
-  const getTimeframe = (data: any): string => {
-    if (data.urgency === 'emergency') return 'Immediate';
-    if (data.urgency === 'urgent') return 'Within 24 hours';
+  const getTimeframe = (urgency: string): string => {
+    if (urgency === 'emergency') return 'Immediate';
+    if (urgency === 'urgent') return 'Within 24 hours';
     return 'Within 1-2 weeks';
   };
 

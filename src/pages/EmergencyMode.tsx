@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  AlertTriangle, 
-  Phone, 
-  MapPin, 
-  Navigation, 
-  Clock, 
+import {
+  AlertTriangle,
+  Phone,
+  MapPin,
+  Navigation,
+  Clock,
   Heart,
   Zap,
   Car,
   Shield,
   ChevronRight
 } from 'lucide-react';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
 
 interface EmergencyFacility {
   id: string;
@@ -27,54 +29,31 @@ interface EmergencyFacility {
 const EmergencyMode: React.FC = () => {
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [locationError, setLocationError] = useState<string | null>(null);
-  const [emergencyFacilities] = useState<EmergencyFacility[]>([
-    {
-      id: '1',
-      name: 'Manhattan General Hospital ER',
-      type: 'hospital',
-      address: '123 Medical Center Dr, New York, NY 10001',
-      phone: '+1-555-0101',
-      distance: 1.2,
-      eta: 8,
-      availability: 'medium',
-      specialties: ['Emergency Medicine', 'Trauma', 'Cardiology']
-    },
-    {
-      id: '2',
-      name: 'NYC Emergency Medical Center',
-      type: 'hospital',
-      address: '456 Emergency Ave, New York, NY 10002',
-      phone: '+1-555-0102',
-      distance: 2.1,
-      eta: 12,
-      availability: 'high',
-      specialties: ['Emergency Medicine', 'Pediatric Emergency', 'Neurology']
-    },
-    {
-      id: '3',
-      name: 'CityMed Urgent Care',
-      type: 'urgent_care',
-      address: '789 Health Plaza, New York, NY 10003',
-      phone: '+1-555-0103',
-      distance: 0.8,
-      eta: 5,
-      availability: 'high',
-      specialties: ['Urgent Care', 'Minor Emergency', 'X-Ray']
-    }
-  ]);
+  const [emergencyFacilities, setEmergencyFacilities] = useState<EmergencyFacility[]>([]);
 
   useEffect(() => {
     // Get user's current location
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setUserLocation({
+        async (position) => {
+          const coords = {
             lat: position.coords.latitude,
             lng: position.coords.longitude
-          });
+          };
+          setUserLocation(coords);
+
+          try {
+            const response = await fetch(`${API_BASE_URL}/location/emergency?lat=${coords.lat}&lng=${coords.lng}`);
+            const data = await response.json();
+            if (data.success) {
+              setEmergencyFacilities(data.facilities);
+            }
+          } catch (err) {
+            console.error('Failed to fetch emergency facilities', err);
+          }
         },
         (error) => {
-          setLocationError('Unable to get your location. Using default location.');
+          setLocationError('Unable to get your location.');
           console.error('Geolocation error:', error);
         }
       );
@@ -181,7 +160,7 @@ const EmergencyMode: React.FC = () => {
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold text-gray-900">Nearest Emergency Care</h2>
             <div className="text-sm text-gray-600">
-              {userLocation ? 'Based on your location' : 'Default location: New York, NY'}
+              {userLocation ? 'Based on your location' : 'Waiting for location...'}
             </div>
           </div>
 
