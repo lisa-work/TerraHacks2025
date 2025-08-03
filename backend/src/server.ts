@@ -24,7 +24,7 @@ import medicalHistoryRoutes from './routes/medicalHistory';
 import notificationRoutes from './routes/notification';
 
 // Load environment variables
-dotenv.config({ path: path.resolve(__dirname, '../.env') });
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
 const app = express();
 const server = createServer(app);
