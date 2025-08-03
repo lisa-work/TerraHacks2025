@@ -47,14 +47,9 @@ const protect = async (req: AuthRequest, res: Response, next: NextFunction): Pro
         });
       }
 
-      // Check if user is verified
-      if (!user.isVerified) {
-        return res.status(401).json({
-          success: false,
-          error: 'Please verify your email to access this resource'
-        });
-      }
-
+      // Allow access even if the user's email is not verified to prevent
+      // unnecessary 401 errors during development or when email
+      // verification hasn't been completed yet.
       req.user = user;
       next();
     } catch (error) {

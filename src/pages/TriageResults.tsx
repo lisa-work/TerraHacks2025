@@ -106,18 +106,18 @@ const TriageResults: React.FC = () => {
   const getSelfCareAdvice = (data: SymptomData): string => {
     const symptoms = data.symptoms.toLowerCase();
     if (symptoms.includes('cut') || symptoms.includes('bleeding')) {
-      return 'Clean the wound with running water, apply gentle pressure to stop bleeding, and cover with a sterile bandage. Seek medical care if the cut is deep or does not stop bleeding.';
+      return 'Do: Rinse the wound with clean water, apply gentle pressure to stop bleeding, and cover with a sterile bandage. Avoid: using harsh chemicals like hydrogen peroxide on deep cuts. Drink: plenty of water to stay hydrated. Eat: foods rich in vitamin C and protein to support healing.';
     }
     if (symptoms.includes('sprain') || symptoms.includes('swelling')) {
-      return 'Rest the injured area, apply ice wrapped in a cloth for 20 minutes, compress with an elastic bandage, and keep it elevated.';
+      return 'Do: Rest the injured area, apply ice wrapped in a cloth for 20 minutes, compress with an elastic bandage, and keep it elevated. Avoid: putting weight on the injury until the pain subsides. Drink: water or electrolyte beverages to reduce inflammation.';
     }
     if (symptoms.includes('fever')) {
-      return 'Stay hydrated, rest, and consider an over-the-counter fever reducer such as acetaminophen. Seek medical care if the fever is high or persistent.';
+      return 'Do: Rest, wear light clothing, and take acetaminophen or ibuprofen as directed. Avoid: excessive physical activity and alcohol. Drink: water, clear broths, or oral rehydration solutions. Eat: light meals like soups or fruits if you have an appetite.';
     }
     if (symptoms.includes('headache')) {
-      return 'Rest in a quiet, dark room and stay hydrated. Over-the-counter pain relief may help.';
+      return 'Do: Rest in a quiet, dark room and use a cold compress on your forehead. Avoid: excessive screen time and loud environments. Drink: water or herbal teas. Eat: small, light meals and avoid skipping meals.';
     }
-    return 'Rest, monitor your symptoms, and seek medical care if they worsen or do not improve.';
+    return 'Do: Rest and monitor your symptoms. Avoid: strenuous activity. Drink: water regularly. Eat: balanced meals to maintain energy. Seek medical care if symptoms worsen or do not improve.';
   };
 
   const getUrgencyColor = (urgency: string) => {

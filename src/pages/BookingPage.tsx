@@ -18,6 +18,8 @@ import {
 import { useClinics } from '../contexts/ClinicContext';
 import { useUser } from '../contexts/UserContext';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+
 const BookingPage: React.FC = () => {
   const { clinicId } = useParams<{ clinicId: string }>();
   const navigate = useNavigate();
@@ -60,18 +62,40 @@ const BookingPage: React.FC = () => {
   const handleBooking = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isAuthenticated) {
-      // In a real app, this would trigger login modal
       alert('Please sign in to book an appointment');
       return;
     }
 
     setIsBooking(true);
-    
-    // Simulate booking process
-    setTimeout(() => {
-      setIsBooking(false);
+
+    try {
+      const token = localStorage.getItem('mediconnect_token');
+      const response = await fetch(`${API_BASE_URL}/appointments`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          clinicId: clinic.id,
+          appointmentDate: selectedDate,
+          appointmentTime: selectedTime,
+          type: appointmentType,
+          notes
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Booking failed');
+      }
+
       setBookingComplete(true);
-    }, 2000);
+    } catch (err) {
+      console.error('Booking failed', err);
+      alert('Failed to book appointment');
+    } finally {
+      setIsBooking(false);
+    }
   };
 
   const availableDates = [
