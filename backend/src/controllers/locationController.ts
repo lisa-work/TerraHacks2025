@@ -1,6 +1,25 @@
 import { Request, Response, NextFunction } from 'express';
 import mapsService from '../services/mapsService';
 
+// Get coordinates from address string
+export const geocodeAddress = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { address } = req.query;
+    if (!address) {
+      return res.status(400).json({ success: false, error: 'address is required' });
+    }
+
+    const location = await mapsService.geocodeAddress(address as string);
+    if (!location) {
+      return res.status(404).json({ success: false, error: 'Address not found' });
+    }
+
+    return res.status(200).json({ success: true, location });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // Get human readable address from coordinates
 export const reverseGeocode = async (req: Request, res: Response, next: NextFunction) => {
   try {

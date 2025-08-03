@@ -3,8 +3,25 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getEmergencyFacilities = exports.reverseGeocode = void 0;
+exports.getEmergencyFacilities = exports.reverseGeocode = exports.geocodeAddress = void 0;
 const mapsService_1 = __importDefault(require("../services/mapsService"));
+const geocodeAddress = async (req, res, next) => {
+    try {
+        const { address } = req.query;
+        if (!address) {
+            return res.status(400).json({ success: false, error: 'address is required' });
+        }
+        const location = await mapsService_1.default.geocodeAddress(address);
+        if (!location) {
+            return res.status(404).json({ success: false, error: 'Address not found' });
+        }
+        return res.status(200).json({ success: true, location });
+    }
+    catch (error) {
+        next(error);
+    }
+};
+exports.geocodeAddress = geocodeAddress;
 const reverseGeocode = async (req, res, next) => {
     try {
         const { lat, lng } = req.query;

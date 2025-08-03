@@ -26,6 +26,7 @@ const SearchResults: React.FC = () => {
   });
   const [searchParams, setSearchParams] = useState<{
     location: string;
+    coordinates?: { lat: number; lng: number };
     urgency: 'emergency' | 'urgent' | 'routine';
   } | null>(null);
 
@@ -34,7 +35,7 @@ const SearchResults: React.FC = () => {
     const symptomData = sessionStorage.getItem('symptomData');
     if (symptomData) {
       const data = JSON.parse(symptomData);
-      setSearchParams({ location: data.location, urgency: data.urgency });
+      setSearchParams({ location: data.location, urgency: data.urgency, coordinates: data.coordinates });
       setFilters(prev => ({ ...prev, insurance: data.insurance || 'any' }));
       searchClinics({
         location: data.location,
@@ -52,6 +53,7 @@ const SearchResults: React.FC = () => {
     if (searchParams) {
       searchClinics({
         location: searchParams.location,
+        userLocation: searchParams.coordinates,
         specialty: filters.specialty,
         insurance: filters.insurance,
         urgency: searchParams.urgency,

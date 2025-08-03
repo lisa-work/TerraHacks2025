@@ -1,8 +1,9 @@
 import { Router } from 'express';
-import { reverseGeocode, getEmergencyFacilities } from '../controllers/locationController';
+import { geocodeAddress, reverseGeocode, getEmergencyFacilities } from '../controllers/locationController';
 
 const router = Router();
 
+router.get('/geocode', geocodeAddress);
 router.get('/reverse-geocode', reverseGeocode);
 router.get('/emergency', getEmergencyFacilities);
 
