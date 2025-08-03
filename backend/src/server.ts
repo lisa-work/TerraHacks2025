@@ -13,6 +13,7 @@ import { connectDatabase } from './config/database';
 import { connectRedis } from './config/redis';
 import { errorHandler } from './middleware/errorHandler';
 import { notFoundHandler } from './middleware/notFoundHandler';
+import { seedInsuranceProviders } from './utils/seedData';
 
 // Routes
 import authRoutes from './routes/auth';
@@ -22,6 +23,8 @@ import appointmentRoutes from './routes/appointment';
 import triageRoutes from './routes/triage';
 import medicalHistoryRoutes from './routes/medicalHistory';
 import notificationRoutes from './routes/notification';
+import insuranceRoutes from './routes/insurance';
+import uploadRoutes from './routes/upload';
 
 // Load environment variables
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
@@ -81,6 +84,8 @@ app.use('/api/appointments', appointmentRoutes);
 app.use('/api/triage', triageRoutes);
 app.use('/api/medical-history', medicalHistoryRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/insurance', insuranceRoutes);
+app.use('/api/upload', uploadRoutes);
 
 // WebSocket connection handling
 io.on('connection', (socket) => {
@@ -109,6 +114,9 @@ const startServer = async () => {
     // Connect to databases
     await connectDatabase();
     await connectRedis();
+    
+    // Seed initial data
+    await seedInsuranceProviders();
     
     const environment = process.env.NODE_ENV || 'development';
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
