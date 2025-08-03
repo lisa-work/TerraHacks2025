@@ -24,7 +24,7 @@ import medicalHistoryRoutes from './routes/medicalHistory';
 import notificationRoutes from './routes/notification';
 
 // Load environment variables
-dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 console.log('Loaded GOOGLE_MAPS_API_KEY:', process.env.GOOGLE_MAPS_API_KEY);
 
 const app = express();
