@@ -126,18 +126,22 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
-        }
+        },
+        credentials: 'include'
       });
 
       if (response.ok) {
         const data = await response.json();
         setUser(data.user);
       } else {
+        // Clear any invalid or expired token and reset user state
         localStorage.removeItem('mediconnect_token');
+        setUser(null);
       }
     } catch (error) {
       console.error('Token validation failed:', error);
       localStorage.removeItem('mediconnect_token');
+      setUser(null);
     } finally {
       setLoading(false);
     }
