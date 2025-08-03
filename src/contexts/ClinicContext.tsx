@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useCallback } from 'react';
 
 export interface Clinic {
   id: string;
@@ -104,7 +104,7 @@ export const ClinicProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   const [filteredClinics, setFilteredClinics] = useState<Clinic[]>(mockClinics);
   const [selectedClinic, setSelectedClinic] = useState<Clinic | null>(null);
 
-  const searchClinics = (filters: SearchFilters) => {
+  const searchClinics = useCallback((filters: SearchFilters) => {
     // Recalculate distances based on user's location if provided
     const processed = clinics.map(clinic => {
       let distance = clinic.distance;
@@ -162,7 +162,7 @@ export const ClinicProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     filtered.sort((a, b) => a.distance - b.distance);
 
     setFilteredClinics(filtered);
-  };
+  }, [clinics]);
 
   return (
     <ClinicContext.Provider value={{
