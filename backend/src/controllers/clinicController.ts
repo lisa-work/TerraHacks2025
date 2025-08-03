@@ -120,7 +120,7 @@ export const searchClinics = async (req: Request, res: Response, next: NextFunct
 
       // Sort by distance if requested
       if (sortBy === 'distance') {
-        clinics.sort((a, b) => (a.distance || 0) - (b.distance || 0));
+        clinics.sort((a, b) => ((a as any).distance || 0) - ((b as any).distance || 0));
       }
     }
 
@@ -156,7 +156,7 @@ export const searchClinics = async (req: Request, res: Response, next: NextFunct
 // @desc    Get clinic by ID
 // @route   GET /api/clinics/:id
 // @access  Public
-export const getClinic = async (req: Request, res: Response, next: NextFunction) => {
+export const getClinic = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
   try {
     const { id } = req.params;
 
@@ -190,7 +190,7 @@ export const getClinic = async (req: Request, res: Response, next: NextFunction)
 // @desc    Get clinic availability
 // @route   GET /api/clinics/:id/availability
 // @access  Public
-export const getClinicAvailability = async (req: Request, res: Response, next: NextFunction) => {
+export const getClinicAvailability = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
   try {
     const { id } = req.params;
     const { date, duration = 30 } = req.query;
@@ -245,7 +245,7 @@ export const getClinicAvailability = async (req: Request, res: Response, next: N
 // @desc    Get nearby clinics
 // @route   GET /api/clinics/nearby
 // @access  Public
-export const getNearbyClinicsByLocation = async (req: Request, res: Response, next: NextFunction) => {
+export const getNearbyClinicsByLocation = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
   try {
     const { lat, lng, radius = 25, limit = 10 } = req.query;
 

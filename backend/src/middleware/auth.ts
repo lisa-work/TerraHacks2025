@@ -12,7 +12,7 @@ interface JwtPayload {
   exp: number;
 }
 
-const protect = async (req: AuthRequest, res: Response, next: NextFunction) => {
+const protect = async (req: AuthRequest, res: Response, next: NextFunction): Promise<any> => {
   try {
     let token: string | undefined;
 
@@ -69,7 +69,7 @@ const protect = async (req: AuthRequest, res: Response, next: NextFunction) => {
 };
 
 const authorize = (...roles: string[]) => {
-  return (req: AuthRequest, res: Response, next: NextFunction) => {
+  return (req: AuthRequest, res: Response, next: NextFunction): any => {
     if (!req.user) {
       return res.status(401).json({
         success: false,

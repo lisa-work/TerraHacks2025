@@ -8,7 +8,7 @@ import { AuthRequest } from '../middleware/auth';
 // @desc    Register user
 // @route   POST /api/auth/register
 // @access  Public
-export const register = async (req: Request, res: Response, next: NextFunction) => {
+export const register = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
   try {
     const {
       name,
@@ -124,7 +124,7 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
 // @desc    Login user
 // @route   POST /api/auth/login
 // @access  Public
-export const login = async (req: Request, res: Response, next: NextFunction) => {
+export const login = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
   try {
     const { email, password } = req.body;
 
@@ -169,7 +169,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 // @desc    Verify email
 // @route   POST /api/auth/verify-email
 // @access  Public
-export const verifyEmail = async (req: Request, res: Response, next: NextFunction) => {
+export const verifyEmail = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
   try {
     const { token } = req.body;
 
@@ -202,7 +202,7 @@ export const verifyEmail = async (req: Request, res: Response, next: NextFunctio
 // @desc    Resend verification email
 // @route   POST /api/auth/resend-verification
 // @access  Public
-export const resendVerification = async (req: Request, res: Response, next: NextFunction) => {
+export const resendVerification = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
   try {
     const { email } = req.body;
 
@@ -261,7 +261,7 @@ export const resendVerification = async (req: Request, res: Response, next: Next
 // @desc    Forgot password
 // @route   POST /api/auth/forgot-password
 // @access  Public
-export const forgotPassword = async (req: Request, res: Response, next: NextFunction) => {
+export const forgotPassword = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
   try {
     const { email } = req.body;
 
@@ -319,7 +319,7 @@ export const forgotPassword = async (req: Request, res: Response, next: NextFunc
 // @desc    Reset password
 // @route   PUT /api/auth/reset-password
 // @access  Public
-export const resetPassword = async (req: Request, res: Response, next: NextFunction) => {
+export const resetPassword = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
   try {
     const { token, password } = req.body;
 
@@ -392,7 +392,7 @@ export const logout = async (req: Request, res: Response, next: NextFunction) =>
 // @desc    Refresh token
 // @route   POST /api/auth/refresh-token
 // @access  Public
-export const refreshToken = async (req: Request, res: Response, next: NextFunction) => {
+export const refreshToken = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
   try {
     const { refreshToken: token } = req.body;
 
@@ -414,7 +414,7 @@ export const refreshToken = async (req: Request, res: Response, next: NextFuncti
         });
       }
 
-      const newToken = generateToken(user._id);
+      const newToken = generateToken((user as any)._id.toString());
 
       res.status(200).json({
         success: true,

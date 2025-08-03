@@ -136,7 +136,7 @@ export const startTriageSession = async (req: AuthRequest, res: Response, next: 
 // @desc    Get triage session results
 // @route   GET /api/triage/session/:sessionId
 // @access  Public
-export const getTriageSession = async (req: Request, res: Response, next: NextFunction) => {
+export const getTriageSession = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
   try {
     const { sessionId } = req.params;
 
@@ -172,7 +172,7 @@ export const getTriageSession = async (req: Request, res: Response, next: NextFu
 // @desc    Submit feedback for triage session
 // @route   POST /api/triage/session/:sessionId/feedback
 // @access  Public
-export const submitTriageFeedback = async (req: Request, res: Response, next: NextFunction) => {
+export const submitTriageFeedback = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
   try {
     const { sessionId } = req.params;
     const { helpful, accuracy, comments } = req.body;
