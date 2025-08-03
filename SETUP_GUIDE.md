@@ -73,7 +73,7 @@ ENCRYPTION_KEY=your-32-character-encryption-key-here
 
 # Google Services
 GOOGLE_MAPS_API_KEY=your-google-maps-api-key
-GEMINI_API_KEY=your-gemini-api-key
+GEMINI_API_KEY=your-gemini-api-key # Optional - backend falls back to stub responses if not provided
 
 # Email Configuration
 EMAIL_HOST=smtp.gmail.com
@@ -105,7 +105,7 @@ VITE_BACKEND_URL=http://localhost:5000
 
 # Google Services API Keys
 VITE_GOOGLE_MAPS_API_KEY=your-google-maps-api-key-here
-VITE_GEMINI_API_KEY=your-gemini-api-key-here
+VITE_GEMINI_API_KEY=your-gemini-api-key-here # Optional
 
 # App Configuration
 VITE_APP_NAME=MediConnect AI

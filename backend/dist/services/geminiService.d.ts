@@ -29,12 +29,14 @@ interface TriageResult {
     disclaimers: string[];
 }
 declare class GeminiService {
-    private genAI;
-    private model;
+    private genAI?;
+    private model?;
+    private isConfigured;
     constructor();
     analyzeSymptoms(symptomData: SymptomData): Promise<TriageResult>;
     private buildTriagePrompt;
     private parseTriageResponse;
+    private getFallbackResult;
     generateFollowUpQuestions(symptomData: SymptomData, triageResult: TriageResult): Promise<Array<{
         question: string;
         importance: 'high' | 'medium' | 'low';
