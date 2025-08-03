@@ -11,6 +11,7 @@ import {
   Shield,
   ChevronRight
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
 
@@ -126,14 +127,15 @@ const EmergencyMode: React.FC = () => {
               <Phone className="w-6 h-6" />
               <span>Call 911</span>
             </button>
-            
-            <button
-              onClick={() => callFacility('+1-555-POISON')}
-              className="flex items-center justify-center space-x-3 bg-orange-600 text-white p-4 rounded-lg hover:bg-orange-700 transition-colors font-semibold"
-            >
-              <Shield className="w-6 h-6" />
-              <span>Poison Control</span>
-            </button>
+
+            <a href="https://www.ontariopoisoncentre.ca/about-us/contact-us/" target="_blank" rel="noopener noreferrer" className="w-full">
+              <button
+                className="flex w-full items-center justify-center space-x-3 bg-orange-600 text-white p-4 rounded-lg hover:bg-orange-700 transition-colors font-semibold"
+              >
+                <Shield className="w-6 h-6" />
+                <span>Poison Control</span>
+              </button>
+            </a>
             
             <button
               onClick={() => window.open('https://www.redcross.org/take-a-class/first-aid/performing-first-aid/first-aid-steps?srsltid=AfmBOopFHlECoY3kCa1D5MjWRc2TpwJuhyDhkM-c0ITlMjX62pU-GGXU', '_blank')}

@@ -259,10 +259,10 @@ const Dashboard: React.FC = () => {
                   <div>
                     <div className="flex items-center justify-between mb-6">
                       <h2 className="text-xl font-bold text-gray-900">Appointment History</h2>
-                      <button className="flex items-center space-x-2 border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors">
+                      {/* <button className="flex items-center space-x-2 border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors">
                         <Filter className="w-4 h-4" />
                         <span>Filter</span>
-                      </button>
+                      </button> */}
                     </div>
 
                     <div className="space-y-4">
@@ -413,9 +413,9 @@ const Dashboard: React.FC = () => {
                       <span className="text-sm text-gray-600">{upcomingAppointments[0].clinicName}</span>
                     </div>
                   </div>
-                  <button className="w-full mt-4 bg-[#1D6FA3]/80 text-white py-2 rounded-lg hover:bg-[#1D6FA3] transition-colors">
+                  {/* <button className="w-full mt-4 bg-[#1D6FA3]/80 text-white py-2 rounded-lg hover:bg-[#1D6FA3] transition-colors">
                     View Details
-                  </button>
+                  </button> */}
                 </div>
               )}
 
