@@ -38,6 +38,7 @@ const SearchResults: React.FC = () => {
       setFilters(prev => ({ ...prev, insurance: data.insurance || 'any' }));
       searchClinics({
         location: data.location,
+        userLocation: data.coordinates,
         specialty: 'any',
         insurance: data.insurance || 'any',
         urgency: data.urgency,

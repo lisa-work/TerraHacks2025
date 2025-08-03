@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  MapPin, 
-  Heart, 
-  User, 
-  Calendar, 
-  ChevronRight, 
+import {
+  MapPin,
+  Heart,
+  ChevronRight,
   Mic,
   Shield,
   Clock,
@@ -25,6 +23,7 @@ interface FormData {
   duration: string;
   severity: number;
   location: string;
+  coordinates?: { lat: number; lng: number };
   insurance: string;
   preferredTime: string;
   urgency: 'routine' | 'urgent' | 'emergency';
@@ -56,6 +55,7 @@ const SymptomForm: React.FC = () => {
     duration: '',
     severity: 5,
     location: user?.location?.address || '',
+    coordinates: user?.location ? { lat: user.location.lat, lng: user.location.lng } : undefined,
     insurance: user?.insurance?.provider || '',
     preferredTime: 'morning',
     urgency: 'routine',
@@ -80,6 +80,7 @@ const SymptomForm: React.FC = () => {
       setFormData(prev => ({
         ...prev,
         location: user.location?.address || prev.location,
+        coordinates: user.location ? { lat: user.location.lat, lng: user.location.lng } : prev.coordinates,
         insurance: user.insurance?.provider || prev.insurance,
         medicalHistory: {
           allergies: user.medicalHistory?.allergies || [],
@@ -92,14 +93,18 @@ const SymptomForm: React.FC = () => {
 
   // Attempt to auto-detect user location if not already set
   useEffect(() => {
-    if (!formData.location && navigator.geolocation) {
+    if ((!formData.location || !formData.coordinates) && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(async (position) => {
         try {
           const { latitude, longitude } = position.coords;
           const response = await fetch(`${API_BASE_URL}/location/reverse-geocode?lat=${latitude}&lng=${longitude}`);
           const data = await response.json();
           if (data.success && data.address) {
-            setFormData(prev => ({ ...prev, location: data.address }));
+            setFormData(prev => ({
+              ...prev,
+              location: data.address,
+              coordinates: { lat: latitude, lng: longitude }
+            }));
           }
         } catch (err) {
           console.error('Failed to fetch address from coordinates', err);
@@ -108,7 +113,7 @@ const SymptomForm: React.FC = () => {
         console.error('Geolocation error:', error);
       });
     }
-  }, [formData.location]);
+  }, [formData.location, formData.coordinates]);
 
   const searchInsuranceProviders = async (query: string) => {
     if (!query.trim()) {
@@ -732,7 +737,7 @@ const SymptomForm: React.FC = () => {
                           name="urgency"
                           value={urgency.value}
                           checked={formData.urgency === urgency.value}
-                          onChange={(e) => setFormData({ ...formData, urgency: e.target.value as any })}
+                        onChange={(e) => setFormData({ ...formData, urgency: e.target.value as 'routine' | 'urgent' | 'emergency' })}
                           className="sr-only"
                         />
                         <div className="text-center">
