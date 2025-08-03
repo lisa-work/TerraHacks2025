@@ -81,6 +81,8 @@ const BookingPage: React.FC = () => {
         },
         body: JSON.stringify({
           clinicId: clinic.id,
+          clinicName: clinic.name,
+          clinicAddress: clinic.address,
           appointmentDate: selectedDate,
           appointmentTime: selectedTime,
           type: appointmentType,
@@ -101,13 +103,11 @@ const BookingPage: React.FC = () => {
     }
   };
 
-  const availableDates = [
-    '2024-01-15',
-    '2024-01-16',
-    '2024-01-17',
-    '2024-01-18',
-    '2024-01-19'
-  ];
+  const availableDates = Array.from({ length: 5 }, (_, i) => {
+    const date = new Date();
+    date.setDate(date.getDate() + i + 1);
+    return date.toISOString().split('T')[0];
+  });
 
   const availableTimes = [
     '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',

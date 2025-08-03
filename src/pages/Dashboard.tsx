@@ -5,7 +5,6 @@ import {
   MapPin,
   Star,
   User,
-  Bell,
   Settings,
   CreditCard,
   FileText,
@@ -16,21 +15,22 @@ import { useUser } from '../contexts/UserContext';
 import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+
 interface Appointment {
-  id: string;
+  _id: string;
   clinicName: string;
   clinicAddress: string;
-  date: string;
-  time: string;
+  appointmentDate: string;
+  appointmentTime: string;
   type: string;
-  status: 'upcoming' | 'completed' | 'cancelled';
-  doctor: string;
-  cost: number;
+  status: string;
 }
 
 const Dashboard: React.FC = () => {
   const { user, isAuthenticated, updateUser } = useUser();
   const [activeTab, setActiveTab] = useState('appointments');
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [profile, setProfile] = useState({
     name: user?.name || '',
     email: user?.email || '',
@@ -66,41 +66,27 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const mockAppointments: Appointment[] = [
-    {
-      id: '1',
-      clinicName: 'Manhattan General Hospital',
-      clinicAddress: '123 Medical Center Dr, New York, NY',
-      date: '2025-09-15',
-      time: '09:00',
-      type: 'General Consultation',
-      status: 'upcoming',
-      doctor: 'Dr. Sarah Johnson',
-      cost: 180
-    },
-    {
-      id: '2',
-      clinicName: 'CityMed Urgent Care',
-      clinicAddress: '456 Health Plaza, New York, NY',
-      date: '2025-8-10',
-      time: '14:30',
-      type: 'Follow-up',
-      status: 'completed',
-      doctor: 'Dr. Michael Chen',
-      cost: 120
-    },
-    {
-      id: '3',
-      clinicName: 'Downtown Family Clinic',
-      clinicAddress: '789 Wellness Ave, New York, NY',
-      date: '2025-10-20',
-      time: '11:00',
-      type: 'Specialist Visit',
-      status: 'upcoming',
-      doctor: 'Dr. Emily Rodriguez',
-      cost: 250
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      try {
+        const token = localStorage.getItem('mediconnect_token');
+        const response = await fetch(`${API_BASE_URL}/appointments`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setAppointments(data.data || []);
+        }
+      } catch (error) {
+        console.error('Failed to fetch appointments', error);
+      }
+    };
+    if (isAuthenticated) {
+      fetchAppointments();
     }
-  ];
+  }, [isAuthenticated]);
 
   if (!isAuthenticated) {
     return (
@@ -117,15 +103,20 @@ const Dashboard: React.FC = () => {
     );
   }
 
-  const upcomingAppointments = mockAppointments.filter(apt => apt.status === 'upcoming');
-  const completedAppointments = mockAppointments.filter(apt => apt.status === 'completed');
+  const upcomingAppointments = appointments.filter(apt => apt.status !== 'completed' && apt.status !== 'cancelled');
+  const completedAppointments = appointments.filter(apt => apt.status === 'completed');
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'upcoming': return 'blue';
-      case 'completed': return 'green';
-      case 'cancelled': return 'red';
-      default: return 'gray';
+      case 'scheduled':
+      case 'confirmed':
+        return 'blue';
+      case 'completed':
+        return 'green';
+      case 'cancelled':
+        return 'red';
+      default:
+        return 'gray';
     }
   };
 
@@ -240,7 +231,7 @@ const Dashboard: React.FC = () => {
 
                     <div className="space-y-4">
                       {upcomingAppointments.map((appointment) => (
-                        <div key={appointment.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                        <div key={appointment._id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
                           <div className="flex items-center justify-between">
                             <div className="flex-1">
                               <div className="flex items-center space-x-3 mb-2">
@@ -249,32 +240,24 @@ const Dashboard: React.FC = () => {
                                   {appointment.status}
                                 </span>
                               </div>
-                              
+
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
                                 <div className="flex items-center space-x-2">
                                   <Calendar className="w-4 h-4" />
-                                  <span>{new Date(appointment.date).toLocaleDateString()}</span>
+                                  <span>{new Date(appointment.appointmentDate).toLocaleDateString()}</span>
                                 </div>
                                 <div className="flex items-center space-x-2">
                                   <Clock className="w-4 h-4" />
-                                  <span>{appointment.time}</span>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                  <User className="w-4 h-4" />
-                                  <span>{appointment.doctor}</span>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                  <CreditCard className="w-4 h-4" />
-                                  <span>${appointment.cost}</span>
+                                  <span>{appointment.appointmentTime}</span>
                                 </div>
                               </div>
-                              
+
                               <div className="flex items-center space-x-2 mt-2 text-sm text-gray-500">
                                 <MapPin className="w-4 h-4" />
                                 <span>{appointment.clinicAddress}</span>
                               </div>
                             </div>
-                            
+
                             <div className="flex items-center space-x-2">
                               <button className="p-2 text-gray-400 hover:text-blue-600 transition-colors">
                                 <ChevronRight className="w-4 h-4" />
@@ -300,7 +283,7 @@ const Dashboard: React.FC = () => {
 
                     <div className="space-y-4">
                       {completedAppointments.map((appointment) => (
-                        <div key={appointment.id} className="border border-gray-200 rounded-lg p-4">
+                        <div key={appointment._id} className="border border-gray-200 rounded-lg p-4">
                           <div className="flex items-center justify-between">
                             <div className="flex-1">
                               <div className="flex items-center space-x-3 mb-2">
@@ -309,24 +292,17 @@ const Dashboard: React.FC = () => {
                                   {appointment.status}
                                 </span>
                               </div>
-                              
+
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
                                 <div className="flex items-center space-x-2">
                                   <Calendar className="w-4 h-4" />
-                                  <span>{new Date(appointment.date).toLocaleDateString()}</span>
+                                  <span>{new Date(appointment.appointmentDate).toLocaleDateString()}</span>
                                 </div>
                                 <div className="flex items-center space-x-2">
-                                  <User className="w-4 h-4" />
-                                  <span>{appointment.doctor}</span>
+                                  <Clock className="w-4 h-4" />
+                                  <span>{appointment.appointmentTime}</span>
                                 </div>
                               </div>
-                            </div>
-                            
-                            <div className="text-right">
-                              <div className="text-lg font-semibold text-gray-900">${appointment.cost}</div>
-                              <button className="text-sm text-[#1D6FA3] hover:text-[#1D6FA3]/80">
-                                View Details
-                              </button>
                             </div>
                           </div>
                         </div>
