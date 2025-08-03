@@ -1,3 +1,4 @@
+import './config/env';
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -6,8 +7,6 @@ import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
-import dotenv from 'dotenv';
-import path from 'path';
 
 import { connectDatabase } from './config/database';
 import { connectRedis } from './config/redis';
@@ -26,8 +25,7 @@ import notificationRoutes from './routes/notification';
 import insuranceRoutes from './routes/insurance';
 import uploadRoutes from './routes/upload';
 
-// Load environment variables
-dotenv.config({ path: path.resolve(__dirname, '../.env') });
+// Verify environment variables
 const googleMapsApiKey = process.env.GOOGLE_MAPS_API_KEY;
 if (googleMapsApiKey) {
   console.log('✅ GOOGLE_MAPS_API_KEY loaded');
