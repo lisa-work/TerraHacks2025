@@ -17,56 +17,83 @@ interface DistanceMatrixParams {
     destinations: string[];
     units?: 'metric' | 'imperial';
 }
-declare const MapsService: {
-    geocodeAddress: (address: string) => Promise<LocationData | null>;
-    reverseGeocode: (lat: number, lng: number) => Promise<string | null>;
-    findNearbyPlaces: (params: NearbySearchParams) => Promise<{
-        placeId: string;
-        name: string;
-        address: string;
+declare class MapsService {
+    private client;
+    constructor();
+    private getApiKey;
+    geocodeAddress(address: string): Promise<LocationData | null>;
+    reverseGeocode(lat: number, lng: number): Promise<string | null>;
+    findNearbyPlaces(params: NearbySearchParams): Promise<{
+        placeId: string | undefined;
+        name: string | undefined;
+        address: string | undefined;
         location: {
-            lat: number;
-            lng: number;
+            lat: number | undefined;
+            lng: number | undefined;
         };
-        rating: number;
-        priceLevel: number;
-        types: string[];
-        photos: never[];
+        rating: number | undefined;
+        priceLevel: number | undefined;
+        types: import("@googlemaps/google-maps-services-js").AddressType[] | undefined;
+        photos: {
+            photoReference: string;
+            width: number;
+            height: number;
+        }[] | undefined;
     }[]>;
-    getPlaceDetails: (placeId: string) => Promise<{
-        placeId: string;
-        name: string;
-        address: string;
+    getPlaceDetails(placeId: string): Promise<{
+        placeId: string | undefined;
+        name: string | undefined;
+        address: string | undefined;
         location: {
-            lat: number;
-            lng: number;
+            lat: number | undefined;
+            lng: number | undefined;
         };
-        phone: string;
-        website: string;
-        rating: number;
-        openingHours: string[];
-        reviews: never[];
-        photos: never[];
-        types: string[];
+        phone: string | undefined;
+        website: string | undefined;
+        rating: number | undefined;
+        openingHours: string[] | undefined;
+        reviews: {
+            author: string;
+            rating: number;
+            text: string;
+            time: string;
+        }[] | undefined;
+        photos: {
+            photoReference: string;
+            width: number;
+            height: number;
+        }[] | undefined;
+        types: import("@googlemaps/google-maps-services-js").AddressType[] | undefined;
     }>;
-    calculateDistanceMatrix: (params: DistanceMatrixParams) => Promise<{
+    calculateDistanceMatrix(params: DistanceMatrixParams): Promise<{
         origin: string;
         destinations: {
             destination: string;
-            distance: {
-                text: string;
-                value: number;
-            };
-            duration: {
-                text: string;
-                value: number;
-            };
-            status: string;
+            distance: import("@googlemaps/google-maps-services-js").Distance;
+            duration: import("@googlemaps/google-maps-services-js").Duration;
+            status: import("@googlemaps/google-maps-services-js").Status;
         }[];
     }[]>;
-    calculateDistance: (lat1: number, lng1: number, lat2: number, lng2: number) => number;
-    generateDirectionsUrl: (origin: string, destination: string) => string;
-    generateStaticMapUrl: () => string;
-};
-export default MapsService;
+    calculateDistance(lat1: number, lng1: number, lat2: number, lng2: number): number;
+    private toRadians;
+    generateDirectionsUrl(origin: string, destination: string): string;
+    generateStaticMapUrl(params: {
+        center: {
+            lat: number;
+            lng: number;
+        };
+        zoom: number;
+        size: {
+            width: number;
+            height: number;
+        };
+        markers?: Array<{
+            lat: number;
+            lng: number;
+            label?: string;
+        }>;
+    }): string;
+}
+declare const _default: MapsService;
+export default _default;
 //# sourceMappingURL=mapsService.d.ts.map

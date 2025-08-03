@@ -11,14 +11,42 @@ const email_1 = require("../utils/email");
 const register = async (req, res, next) => {
     try {
         const { name, email, password, phone, dateOfBirth, gender, location, insurance, medicalHistory, preferences } = req.body;
+        if (!password || password.length < 8) {
+            return res.status(400).json({
+                success: false,
+                error: 'Password must be at least 8 characters long'
+            });
+        }
+        const hasUppercase = /[A-Z]/.test(password);
+        const hasNumber = /\d/.test(password);
+        if (!hasUppercase) {
+            return res.status(400).json({
+                success: false,
+                error: 'Password must contain at least one uppercase letter'
+            });
+        }
+        if (!hasNumber) {
+            return res.status(400).json({
+                success: false,
+                error: 'Password must contain at least one number'
+            });
+        }
         const existingUser = await User_1.default.findOne({
             $or: [{ email }, { phone }]
         });
         if (existingUser) {
-            return res.status(400).json({
-                success: false,
-                error: 'User with this email or phone already exists'
-            });
+            if (existingUser.email === email) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'An account with this email already exists'
+                });
+            }
+            else {
+                return res.status(400).json({
+                    success: false,
+                    error: 'An account with this phone number already exists'
+                });
+            }
         }
         const verificationToken = crypto_1.default.randomBytes(20).toString('hex');
         const user = await User_1.default.create({

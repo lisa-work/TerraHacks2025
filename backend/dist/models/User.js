@@ -80,36 +80,30 @@ const UserSchema = new mongoose_1.Schema({
     location: {
         lat: {
             type: Number,
-            required: [true, 'Latitude is required'],
             min: [-90, 'Latitude must be between -90 and 90'],
             max: [90, 'Latitude must be between -90 and 90']
         },
         lng: {
             type: Number,
-            required: [true, 'Longitude is required'],
             min: [-180, 'Longitude must be between -180 and 180'],
             max: [180, 'Longitude must be between -180 and 180']
         },
         address: {
             type: String,
-            required: [true, 'Address is required'],
             trim: true
         }
     },
     insurance: {
         provider: {
             type: String,
-            required: [true, 'Insurance provider is required'],
             trim: true
         },
         policyNumber: {
             type: String,
-            required: [true, 'Policy number is required'],
             trim: true
         },
         groupNumber: {
             type: String,
-            required: [true, 'Group number is required'],
             trim: true
         },
         memberId: {
@@ -214,17 +208,14 @@ const UserSchema = new mongoose_1.Schema({
         emergencyContact: {
             name: {
                 type: String,
-                required: true,
                 trim: true
             },
             relationship: {
                 type: String,
-                required: true,
                 trim: true
             },
             phone: {
                 type: String,
-                required: true,
                 match: [/^\+?[\d\s\-\(\)]+$/, 'Please enter a valid phone number']
             },
             email: {
