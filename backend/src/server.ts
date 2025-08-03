@@ -7,6 +7,7 @@ import rateLimit from 'express-rate-limit';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import dotenv from 'dotenv';
+import path from 'path';
 
 import { connectDatabase } from './config/database';
 import { connectRedis } from './config/redis';
@@ -23,7 +24,7 @@ import medicalHistoryRoutes from './routes/medicalHistory';
 import notificationRoutes from './routes/notification';
 
 // Load environment variables
-dotenv.config();
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 const app = express();
 const server = createServer(app);
