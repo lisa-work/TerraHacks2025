@@ -24,6 +24,7 @@ import medicalHistoryRoutes from './routes/medicalHistory';
 import notificationRoutes from './routes/notification';
 import insuranceRoutes from './routes/insurance';
 import uploadRoutes from './routes/upload';
+import locationRoutes from './routes/location';
 
 // Verify environment variables
 const googleMapsApiKey = process.env.GOOGLE_MAPS_API_KEY;
@@ -84,6 +85,7 @@ app.use('/api/medical-history', medicalHistoryRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/insurance', insuranceRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/location', locationRoutes);
 
 // WebSocket connection handling
 io.on('connection', (socket) => {

@@ -90,6 +90,26 @@ const SymptomForm: React.FC = () => {
     }
   }, [user]);
 
+  // Attempt to auto-detect user location if not already set
+  useEffect(() => {
+    if (!formData.location && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(async (position) => {
+        try {
+          const { latitude, longitude } = position.coords;
+          const response = await fetch(`${API_BASE_URL}/location/reverse-geocode?lat=${latitude}&lng=${longitude}`);
+          const data = await response.json();
+          if (data.success && data.address) {
+            setFormData(prev => ({ ...prev, location: data.address }));
+          }
+        } catch (err) {
+          console.error('Failed to fetch address from coordinates', err);
+        }
+      }, (error) => {
+        console.error('Geolocation error:', error);
+      });
+    }
+  }, [formData.location]);
+
   const searchInsuranceProviders = async (query: string) => {
     if (!query.trim()) {
       setInsuranceProviders([]);
