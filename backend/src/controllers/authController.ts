@@ -23,16 +23,48 @@ export const register = async (req: Request, res: Response, next: NextFunction):
       preferences
     } = req.body;
 
+    // Validate password strength
+    if (!password || password.length < 8) {
+      return res.status(400).json({
+        success: false,
+        error: 'Password must be at least 8 characters long'
+      });
+    }
+
+    const hasUppercase = /[A-Z]/.test(password);
+    const hasNumber = /\d/.test(password);
+
+    if (!hasUppercase) {
+      return res.status(400).json({
+        success: false,
+        error: 'Password must contain at least one uppercase letter'
+      });
+    }
+
+    if (!hasNumber) {
+      return res.status(400).json({
+        success: false,
+        error: 'Password must contain at least one number'
+      });
+    }
+
     // Check if user exists
     const existingUser = await User.findOne({ 
       $or: [{ email }, { phone }] 
     });
 
     if (existingUser) {
-      return res.status(400).json({
-        success: false,
-        error: 'User with this email or phone already exists'
-      });
+      if (existingUser.email === email) {
+        return res.status(400).json({
+          success: false,
+          error: 'An account with this email already exists'
+        });
+      } else {
+        return res.status(400).json({
+          success: false,
+          error: 'An account with this phone number already exists'
+        });
+      }
     }
 
     // Create verification token

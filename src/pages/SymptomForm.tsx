@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   MapPin, 
@@ -8,8 +8,17 @@ import {
   ChevronRight, 
   Mic,
   Shield,
-  Clock
+  Clock,
+  Upload,
+  X,
+  Search,
+  AlertCircle,
+  Camera,
+  FileText
 } from 'lucide-react';
+import { useUser } from '../contexts/UserContext';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
 
 interface FormData {
   symptoms: string;
@@ -19,30 +28,185 @@ interface FormData {
   insurance: string;
   preferredTime: string;
   urgency: 'routine' | 'urgent' | 'emergency';
+  medicalHistory: {
+    allergies: string[];
+    conditions: string[];
+    medications: string[];
+  };
+  uploadedImages: File[];
+  imageDescriptions: string[];
+}
+
+interface InsuranceProvider {
+  _id: string;
+  name: string;
+  type: string;
+  contactInfo: {
+    phone: string;
+    website?: string;
+  };
 }
 
 const SymptomForm: React.FC = () => {
   const navigate = useNavigate();
+  const { user } = useUser();
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<FormData>({
     symptoms: '',
     duration: '',
     severity: 5,
-    location: 'New York, NY',
-    insurance: 'Blue Cross Blue Shield',
+    location: user?.location?.address || '',
+    insurance: user?.insurance?.provider || '',
     preferredTime: 'morning',
-    urgency: 'routine'
+    urgency: 'routine',
+    medicalHistory: {
+      allergies: user?.medicalHistory?.allergies || [],
+      conditions: user?.medicalHistory?.conditions?.map(c => c.name) || [],
+      medications: user?.medicalHistory?.medications?.map(m => m.name) || []
+    },
+    uploadedImages: [],
+    imageDescriptions: []
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [insuranceProviders, setInsuranceProviders] = useState<InsuranceProvider[]>([]);
+  const [insuranceSearch, setInsuranceSearch] = useState('');
+  const [showInsuranceDropdown, setShowInsuranceDropdown] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    // Auto-populate user data when available
+    if (user) {
+      setFormData(prev => ({
+        ...prev,
+        location: user.location?.address || prev.location,
+        insurance: user.insurance?.provider || prev.insurance,
+        medicalHistory: {
+          allergies: user.medicalHistory?.allergies || [],
+          conditions: user.medicalHistory?.conditions?.map(c => c.name) || [],
+          medications: user.medicalHistory?.medications?.map(m => m.name) || []
+        }
+      }));
+    }
+  }, [user]);
+
+  const searchInsuranceProviders = async (query: string) => {
+    if (!query.trim()) {
+      setInsuranceProviders([]);
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/insurance/search?q=${encodeURIComponent(query)}`);
+      const data = await response.json();
+      
+      if (data.success) {
+        setInsuranceProviders(data.data);
+      }
+    } catch (error) {
+      console.error('Insurance search failed:', error);
+    }
+  };
+
+  const handleInsuranceSearch = (value: string) => {
+    setInsuranceSearch(value);
+    setShowInsuranceDropdown(true);
+    searchInsuranceProviders(value);
+  };
+
+  const selectInsuranceProvider = (provider: InsuranceProvider) => {
+    setFormData({ ...formData, insurance: provider.name });
+    setInsuranceSearch(provider.name);
+    setShowInsuranceDropdown(false);
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    const validFiles = files.filter(file => {
+      const isValidType = file.type.startsWith('image/');
+      const isValidSize = file.size <= 10 * 1024 * 1024; // 10MB
+      return isValidType && isValidSize;
+    });
+
+    if (validFiles.length !== files.length) {
+      setError('Some files were skipped. Only image files under 10MB are allowed.');
+    }
+
+    setFormData(prev => ({
+      ...prev,
+      uploadedImages: [...prev.uploadedImages, ...validFiles],
+      imageDescriptions: [...prev.imageDescriptions, ...validFiles.map(() => '')]
+    }));
+  };
+
+  const removeImage = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      uploadedImages: prev.uploadedImages.filter((_, i) => i !== index),
+      imageDescriptions: prev.imageDescriptions.filter((_, i) => i !== index)
+    }));
+  };
+
+  const updateImageDescription = (index: number, description: string) => {
+    setFormData(prev => ({
+      ...prev,
+      imageDescriptions: prev.imageDescriptions.map((desc, i) => 
+        i === index ? description : desc
+      )
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Store form data in sessionStorage for the triage page
-    sessionStorage.setItem('symptomData', JSON.stringify(formData));
-    navigate('/triage');
+    setLoading(true);
+    setError('');
+
+    try {
+      // Upload images first if any
+      const uploadedImageIds: string[] = [];
+      
+      if (formData.uploadedImages.length > 0) {
+        for (let i = 0; i < formData.uploadedImages.length; i++) {
+          const formDataUpload = new FormData();
+          formDataUpload.append('image', formData.uploadedImages[i]);
+          formDataUpload.append('description', formData.imageDescriptions[i]);
+          formDataUpload.append('symptoms', formData.symptoms);
+
+          const token = localStorage.getItem('mediconnect_token');
+          const response = await fetch(`${API_BASE_URL}/upload/image`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`
+            },
+            body: formDataUpload
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            uploadedImageIds.push(data.data._id);
+          }
+        }
+      }
+
+      // Store form data with uploaded image IDs
+      const submissionData = {
+        ...formData,
+        uploadedImageIds,
+        userId: user?._id
+      };
+      
+      sessionStorage.setItem('symptomData', JSON.stringify(submissionData));
+      navigate('/triage');
+    } catch (error) {
+      console.error('Submission failed:', error);
+      setError('Failed to submit form. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const nextStep = () => {
-    if (currentStep < 3) {
+    if (currentStep < 4) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -66,10 +230,18 @@ const SymptomForm: React.FC = () => {
           </p>
         </div>
 
+        {/* Error Display */}
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center space-x-3">
+            <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
+            <p className="text-red-700">{error}</p>
+          </div>
+        )}
+
         {/* Progress Bar */}
         <div className="mb-8">
-          <div className="flex items-center justify-center space-x-4">
-            {[1, 2, 3].map((step) => (
+          <div className="flex items-center justify-center space-x-2">
+            {[1, 2, 3, 4].map((step) => (
               <div key={step} className="flex items-center">
                 <div
                   className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold ${
@@ -80,9 +252,9 @@ const SymptomForm: React.FC = () => {
                 >
                   {step}
                 </div>
-                {step < 3 && (
+                {step < 4 && (
                   <div
-                    className={`w-20 h-1 mx-2 ${
+                    className={`w-16 h-1 mx-1 ${
                       step < currentStep ? 'bg-blue-600' : 'bg-gray-200'
                     }`}
                   />
@@ -90,15 +262,18 @@ const SymptomForm: React.FC = () => {
               </div>
             ))}
           </div>
-          <div className="flex justify-center mt-4 space-x-8 text-sm text-gray-600">
+          <div className="flex justify-center mt-4 space-x-6 text-sm text-gray-600">
             <span className={currentStep >= 1 ? 'text-[#1D6FA3] font-medium' : ''}>
               Symptoms
             </span>
             <span className={currentStep >= 2 ? 'text-[#1D6FA3] font-medium' : ''}>
-              Details
+              History
             </span>
             <span className={currentStep >= 3 ? 'text-[#1D6FA3] font-medium' : ''}>
-              Preferences
+              Images
+            </span>
+            <span className={currentStep >= 4 ? 'text-[#1D6FA3] font-medium' : ''}>
+              Details
             </span>
           </div>
         </div>
@@ -185,8 +360,191 @@ const SymptomForm: React.FC = () => {
               </div>
             )}
 
-            {/* Step 2: Details */}
+            {/* Step 2: Medical History */}
             {currentStep === 2 && (
+              <div className="space-y-6">
+                <div className="text-center mb-8">
+                  <FileText className="w-12 h-12 text-[#1D6FA3] mx-auto mb-4" />
+                  <h2 className="text-2xl font-bold text-[#1D6FA3] mb-2">
+                    Medical History
+                  </h2>
+                  <p className="text-gray-600">
+                    This information helps our AI provide more accurate recommendations
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div>
+                    <label className="block text-sm font-bold text-[#1D6FA3] mb-2">
+                      Current Medications
+                    </label>
+                    <textarea
+                      value={formData.medicalHistory.medications.join(', ')}
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        medicalHistory: {
+                          ...formData.medicalHistory,
+                          medications: e.target.value.split(',').map(s => s.trim()).filter(s => s)
+                        }
+                      })}
+                      className="w-full h-24 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-sm"
+                      placeholder="e.g., Lisinopril 10mg, Metformin 500mg"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-bold text-[#1D6FA3] mb-2">
+                      Allergies
+                    </label>
+                    <textarea
+                      value={formData.medicalHistory.allergies.join(', ')}
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        medicalHistory: {
+                          ...formData.medicalHistory,
+                          allergies: e.target.value.split(',').map(s => s.trim()).filter(s => s)
+                        }
+                      })}
+                      className="w-full h-24 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-sm"
+                      placeholder="e.g., Penicillin, Shellfish, Pollen"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-bold text-[#1D6FA3] mb-2">
+                      Medical Conditions
+                    </label>
+                    <textarea
+                      value={formData.medicalHistory.conditions.join(', ')}
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        medicalHistory: {
+                          ...formData.medicalHistory,
+                          conditions: e.target.value.split(',').map(s => s.trim()).filter(s => s)
+                        }
+                      })}
+                      className="w-full h-24 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-sm"
+                      placeholder="e.g., Diabetes, Hypertension, Asthma"
+                    />
+                  </div>
+                </div>
+
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <div className="flex items-start space-x-3">
+                    <Shield className="w-5 h-5 text-[#1D6FA3] mt-0.5" />
+                    <div>
+                      <h3 className="font-bold text-[#1D6FA3]">Optional Information</h3>
+                      <p className="text-sm text-[#1D6FA3] mt-1">
+                        This information is optional but helps provide more personalized care recommendations. 
+                        You can skip this step if you prefer.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Step 3: Image Upload */}
+            {currentStep === 3 && (
+              <div className="space-y-6">
+                <div className="text-center mb-8">
+                  <Camera className="w-12 h-12 text-[#1D6FA3] mx-auto mb-4" />
+                  <h2 className="text-2xl font-bold text-[#1D6FA3] mb-2">
+                    Upload Images (Optional)
+                  </h2>
+                  <p className="text-gray-600">
+                    Upload photos of your symptoms, injuries, or relevant medical documents for AI analysis
+                  </p>
+                </div>
+
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                  <input
+                    type="file"
+                    id="image-upload"
+                    multiple
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                  />
+                  <label
+                    htmlFor="image-upload"
+                    className="cursor-pointer flex flex-col items-center space-y-4"
+                  >
+                    <Upload className="w-12 h-12 text-gray-400" />
+                    <div>
+                      <p className="text-lg font-medium text-gray-700">
+                        Click to upload images
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        PNG, JPG, GIF up to 10MB each
+                      </p>
+                    </div>
+                  </label>
+                </div>
+
+                {formData.uploadedImages.length > 0 && (
+                  <div className="space-y-4">
+                    <h3 className="font-bold text-[#1D6FA3]">Uploaded Images</h3>
+                    {formData.uploadedImages.map((file, index) => (
+                      <div key={index} className="border border-gray-200 rounded-lg p-4">
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
+                              <img
+                                src={URL.createObjectURL(file)}
+                                alt={`Upload ${index + 1}`}
+                                className="w-full h-full object-cover rounded-lg"
+                              />
+                            </div>
+                            <div>
+                              <p className="font-medium text-gray-900">{file.name}</p>
+                              <p className="text-sm text-gray-500">
+                                {(file.size / 1024 / 1024).toFixed(2)} MB
+                              </p>
+                            </div>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => removeImage(index)}
+                            className="p-1 text-gray-400 hover:text-red-500 transition-colors"
+                          >
+                            <X className="w-5 h-5" />
+                          </button>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Description (Optional)
+                          </label>
+                          <input
+                            type="text"
+                            value={formData.imageDescriptions[index]}
+                            onChange={(e) => updateImageDescription(index, e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            placeholder="Describe what this image shows..."
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                  <div className="flex items-start space-x-3">
+                    <AlertCircle className="w-5 h-5 text-yellow-600 mt-0.5" />
+                    <div>
+                      <h3 className="font-bold text-yellow-800">AI Analysis Available</h3>
+                      <p className="text-sm text-yellow-700 mt-1">
+                        Our AI will analyze your uploaded images to help assess the urgency of your condition 
+                        and provide more accurate recommendations.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Step 4: Location & Insurance Details */}
+            {currentStep === 4 && (
               <div className="space-y-6">
                 <div className="text-center mb-8">
                   <MapPin className="w-12 h-12 text-[#1D6FA3] mx-auto mb-4" />
@@ -215,26 +573,42 @@ const SymptomForm: React.FC = () => {
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-bold text-[#1D6FA3]  mb-2">
+                <div className="relative">
+                  <label className="block text-sm font-bold text-[#1D6FA3] mb-2">
                     Insurance Provider
                   </label>
-                  <select
-                    value={formData.insurance}
-                    onChange={(e) => setFormData({ ...formData, insurance: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    required
-                  >
-                    <option value="Blue Cross Blue Shield">Blue Cross Blue Shield</option>
-                    <option value="Aetna">Aetna</option>
-                    <option value="Cigna">Cigna</option>
-                    <option value="UnitedHealth">UnitedHealth</option>
-                    <option value="Kaiser Permanente">Kaiser Permanente</option>
-                    <option value="Anthem">Anthem</option>
-                    <option value="Medicare">Medicare</option>
-                    <option value="Medicaid">Medicaid</option>
-                    <option value="No Insurance">No Insurance</option>
-                  </select>
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    <input
+                      type="text"
+                      value={insuranceSearch || formData.insurance}
+                      onChange={(e) => handleInsuranceSearch(e.target.value)}
+                      onFocus={() => setShowInsuranceDropdown(true)}
+                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="Search for your insurance provider..."
+                      required
+                    />
+                  </div>
+                  
+                  {showInsuranceDropdown && insuranceProviders.length > 0 && (
+                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                      {insuranceProviders.map((provider) => (
+                        <button
+                          key={provider._id}
+                          type="button"
+                          onClick={() => selectInsuranceProvider(provider)}
+                          className="w-full text-left px-4 py-3 hover:bg-blue-50 border-b border-gray-100 last:border-b-0"
+                        >
+                          <div className="font-medium text-gray-900">{provider.name}</div>
+                          <div className="text-sm text-gray-500">{provider.contactInfo.phone}</div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  
+                  <p className="text-sm text-gray-500 mt-1">
+                    Start typing to search, or select "No Insurance" if uninsured
+                  </p>
                 </div>
 
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
@@ -252,8 +626,8 @@ const SymptomForm: React.FC = () => {
               </div>
             )}
 
-            {/* Step 3: Preferences */}
-            {currentStep === 3 && (
+            {/* Step 4: Preferences - moved to end */}
+            {currentStep === 4 && (
               <div className="space-y-6">
                 <div className="text-center mb-8">
                   <Calendar className="w-12 h-12 text-blue-600 mx-auto mb-4" />
@@ -369,7 +743,7 @@ const SymptomForm: React.FC = () => {
                 Previous
               </button>
 
-              {currentStep < 3 ? (
+              {currentStep < 4 ? (
                 <button
                   type="button"
                   onClick={nextStep}
@@ -381,10 +755,11 @@ const SymptomForm: React.FC = () => {
               ) : (
                 <button
                   type="submit"
-                  className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                  disabled={loading}
+                  className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Analyze Symptoms
-                  <ChevronRight className="ml-2 w-5 h-5" />
+                  {loading ? 'Processing...' : 'Analyze Symptoms'}
+                  {!loading && <ChevronRight className="ml-2 w-5 h-5" />}
                 </button>
               )}
             </div>
