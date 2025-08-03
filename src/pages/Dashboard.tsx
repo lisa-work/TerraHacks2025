@@ -38,7 +38,7 @@ const Dashboard: React.FC = () => {
       id: '1',
       clinicName: 'Manhattan General Hospital',
       clinicAddress: '123 Medical Center Dr, New York, NY',
-      date: '2024-01-15',
+      date: '2025-09-15',
       time: '09:00',
       type: 'General Consultation',
       status: 'upcoming',
@@ -49,7 +49,7 @@ const Dashboard: React.FC = () => {
       id: '2',
       clinicName: 'CityMed Urgent Care',
       clinicAddress: '456 Health Plaza, New York, NY',
-      date: '2024-01-10',
+      date: '2025-8-10',
       time: '14:30',
       type: 'Follow-up',
       status: 'completed',
@@ -60,7 +60,7 @@ const Dashboard: React.FC = () => {
       id: '3',
       clinicName: 'Downtown Family Clinic',
       clinicAddress: '789 Wellness Ave, New York, NY',
-      date: '2024-01-20',
+      date: '2025-10-20',
       time: '11:00',
       type: 'Specialist Visit',
       status: 'upcoming',
@@ -432,10 +432,6 @@ const Dashboard: React.FC = () => {
                   <button className="w-full flex items-center space-x-3 p-3 text-left border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
                     <FileText className="w-5 h-5 text-green-600" />
                     <span className="text-sm font-medium text-gray-900">View Records</span>
-                  </button>
-                  <button className="w-full flex items-center space-x-3 p-3 text-left border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-                    <Bell className="w-5 h-5 text-orange-600" />
-                    <span className="text-sm font-medium text-gray-900">Notifications</span>
                   </button>
                 </div>
               </div>
