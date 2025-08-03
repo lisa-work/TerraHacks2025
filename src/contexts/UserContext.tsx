@@ -110,9 +110,12 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   useEffect(() => {
     // Check for existing token on app load
     const token = localStorage.getItem('mediconnect_token');
-    if (token) {
+    // Ensure the token exists and is not an invalid string value before validating
+    if (token && token !== 'undefined' && token !== 'null') {
       validateToken(token);
     } else {
+      // Clean up any malformed token values and stop loading
+      localStorage.removeItem('mediconnect_token');
       setLoading(false);
     }
   }, []);
