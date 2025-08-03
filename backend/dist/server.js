@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.io = void 0;
+require("./config/env");
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const helmet_1 = __importDefault(require("helmet"));
@@ -12,8 +13,6 @@ const morgan_1 = __importDefault(require("morgan"));
 const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
 const http_1 = require("http");
 const socket_io_1 = require("socket.io");
-const dotenv_1 = __importDefault(require("dotenv"));
-const path_1 = __importDefault(require("path"));
 const database_1 = require("./config/database");
 const redis_1 = require("./config/redis");
 const errorHandler_1 = require("./middleware/errorHandler");
@@ -28,7 +27,7 @@ const medicalHistory_1 = __importDefault(require("./routes/medicalHistory"));
 const notification_1 = __importDefault(require("./routes/notification"));
 const insurance_1 = __importDefault(require("./routes/insurance"));
 const upload_1 = __importDefault(require("./routes/upload"));
-dotenv_1.default.config({ path: path_1.default.resolve(__dirname, '../.env') });
+const location_1 = __importDefault(require("./routes/location"));
 const googleMapsApiKey = process.env.GOOGLE_MAPS_API_KEY;
 if (googleMapsApiKey) {
     console.log('✅ GOOGLE_MAPS_API_KEY loaded');
@@ -79,6 +78,7 @@ app.use('/api/medical-history', medicalHistory_1.default);
 app.use('/api/notifications', notification_1.default);
 app.use('/api/insurance', insurance_1.default);
 app.use('/api/upload', upload_1.default);
+app.use('/api/location', location_1.default);
 io.on('connection', (socket) => {
     console.log('User connected:', socket.id);
     socket.on('join-user-room', (userId) => {
