@@ -629,9 +629,8 @@ const SymptomForm: React.FC = () => {
             {/* Step 4: Preferences - moved to end */}
             {currentStep === 4 && (
               <div className="space-y-6">
-                <div className="text-center mb-8">
-                  <Calendar className="w-12 h-12 text-blue-600 mx-auto mb-4" />
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                <div className="text-center my-8">
+                  <h2 className="text-2xl font-bold text-[#1D6FA3] mb-2">
                     Appointment Preferences
                   </h2>
                   <p className="text-gray-600">
@@ -691,7 +690,7 @@ const SymptomForm: React.FC = () => {
                         value: 'urgent', 
                         label: 'Urgent', 
                         desc: 'Need care within 24hrs',
-                        color: 'orange'
+                        color: 'yellow'
                       },
                       { 
                         value: 'emergency', 
@@ -717,7 +716,7 @@ const SymptomForm: React.FC = () => {
                           className="sr-only"
                         />
                         <div className="text-center">
-                          <div className={`w-3 h-3 rounded-full mx-auto mb-2 bg-${urgency.color}-500`} />
+                          {/* <div className={`w-3 h-3 rounded-full mx-auto mb-2 bg-${urgency.color}-500`} /> */}
                           <div className="font-medium text-gray-900">{urgency.label}</div>
                           <div className="text-sm text-gray-500">{urgency.desc}</div>
                         </div>
