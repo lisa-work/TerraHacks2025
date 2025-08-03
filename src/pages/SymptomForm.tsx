@@ -115,6 +115,34 @@ const SymptomForm: React.FC = () => {
     }
   }, [formData.location, formData.coordinates]);
 
+  // Geocode address when location changes
+  useEffect(() => {
+    const controller = new AbortController();
+    const timer = setTimeout(async () => {
+      if (formData.location) {
+        try {
+          const response = await fetch(`${API_BASE_URL}/location/geocode?address=${encodeURIComponent(formData.location)}`, {
+            signal: controller.signal
+          });
+          const data = await response.json();
+          if (data.success && data.location) {
+            setFormData(prev => ({
+              ...prev,
+              coordinates: { lat: data.location.lat, lng: data.location.lng }
+            }));
+          }
+        } catch (err) {
+          console.error('Failed to geocode address', err);
+        }
+      }
+    }, 500);
+
+    return () => {
+      controller.abort();
+      clearTimeout(timer);
+    };
+  }, [formData.location]);
+
   const searchInsuranceProviders = async (query: string) => {
     if (!query.trim()) {
       setInsuranceProviders([]);
