@@ -1,3 +1,4 @@
+import '../config/env';
 interface LocationData {
     lat: number;
     lng: number;

@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+require("../config/env");
 const google_maps_services_js_1 = require("@googlemaps/google-maps-services-js");
 class MapsService {
     constructor() {
