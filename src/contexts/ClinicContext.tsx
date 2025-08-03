@@ -96,6 +96,42 @@ const mockClinics: Clinic[] = [
     coveragePercentage: 95,
     estimatedCost: 120,
     image: 'https://images.pexels.com/photos/4021775/pexels-photo-4021775.jpeg'
+  },
+  {
+    id: '4',
+    name: "St. Michael's Hospital",
+    type: 'hospital',
+    address: '30 Bond St, Toronto, ON M5B 1W8',
+    phone: '+1-416-360-4000',
+    location: { lat: 43.6548, lng: -79.3784 },
+    distance: 2.3,
+    rating: 4.4,
+    reviews: 900,
+    insuranceAccepted: ['OHIP', 'Sun Life', 'Manulife'],
+    availableSlots: ['2024-01-17T09:00', '2024-01-17T15:30', '2024-01-18T11:00'],
+    specialties: ['Emergency Medicine', 'Trauma'],
+    emergencyServices: true,
+    coveragePercentage: 88,
+    estimatedCost: 400,
+    image: 'https://images.pexels.com/photos/263402/pexels-photo-263402.jpeg'
+  },
+  {
+    id: '5',
+    name: 'Sunnybrook Health Sciences Centre',
+    type: 'hospital',
+    address: '2075 Bayview Ave, Toronto, ON M4N 3M5',
+    phone: '+1-416-480-6100',
+    location: { lat: 43.725, lng: -79.378 },
+    distance: 5.2,
+    rating: 4.5,
+    reviews: 1100,
+    insuranceAccepted: ['OHIP', 'Sun Life', 'Manulife'],
+    availableSlots: ['2024-01-18T09:00', '2024-01-18T14:00', '2024-01-19T10:30'],
+    specialties: ['Emergency Medicine', 'Cardiology'],
+    emergencyServices: true,
+    coveragePercentage: 80,
+    estimatedCost: 500,
+    image: 'https://images.pexels.com/photos/236380/pexels-photo-236380.jpeg'
   }
 ];
 
@@ -158,8 +194,14 @@ export const ClinicProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     // Filter by distance
     filtered = filtered.filter(clinic => clinic.distance <= filters.maxDistance);
 
-    // Sort by distance
-    filtered.sort((a, b) => a.distance - b.distance);
+    // Ensure at least 5 results by supplementing with closest clinics
+    if (filtered.length < 5) {
+      const sortedByDistance = [...processed].sort((a, b) => a.distance - b.distance);
+      filtered = sortedByDistance.slice(0, 5);
+    } else {
+      // Sort by distance when enough results
+      filtered.sort((a, b) => a.distance - b.distance);
+    }
 
     setFilteredClinics(filtered);
   }, [clinics]);
