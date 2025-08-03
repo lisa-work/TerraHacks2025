@@ -28,7 +28,7 @@ const notification_1 = __importDefault(require("./routes/notification"));
 dotenv_1.default.config({ path: path_1.default.resolve(__dirname, '../.env') });
 const googleMapsApiKey = process.env.GOOGLE_MAPS_API_KEY;
 if (googleMapsApiKey) {
-    console.log('GOOGLE_MAPS_API_KEY loaded');
+    console.log('✅ GOOGLE_MAPS_API_KEY loaded');
 }
 else {
     console.warn('GOOGLE_MAPS_API_KEY environment variable is not set. Maps features will be disabled.');

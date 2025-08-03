@@ -381,14 +381,6 @@ const Dashboard: React.FC = () => {
                             <input type="checkbox" className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" defaultChecked />
                             <span className="text-sm text-gray-700">Email appointment reminders</span>
                           </label>
-                          <label className="flex items-center space-x-3">
-                            <input type="checkbox" className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" defaultChecked />
-                            <span className="text-sm text-gray-700">SMS notifications</span>
-                          </label>
-                          <label className="flex items-center space-x-3">
-                            <input type="checkbox" className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
-                            <span className="text-sm text-gray-700">Marketing communications</span>
-                          </label>
                         </div>
                       </div>
                     </div>

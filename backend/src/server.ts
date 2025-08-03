@@ -30,7 +30,7 @@ import uploadRoutes from './routes/upload';
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 const googleMapsApiKey = process.env.GOOGLE_MAPS_API_KEY;
 if (googleMapsApiKey) {
-  console.log('GOOGLE_MAPS_API_KEY loaded');
+  console.log('✅ GOOGLE_MAPS_API_KEY loaded');
 } else {
   console.warn('GOOGLE_MAPS_API_KEY environment variable is not set. Maps features will be disabled.');
 }
