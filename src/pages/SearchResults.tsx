@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  MapPin, 
-  Star, 
-  Clock, 
-  Phone, 
-  Shield, 
+import {
+  MapPin,
+  Star,
+  Phone,
+  Shield,
   Filter,
   ChevronDown,
   Navigation,
@@ -25,21 +24,41 @@ const SearchResults: React.FC = () => {
     insurance: 'any',
     specialty: 'any'
   });
+  const [searchParams, setSearchParams] = useState<{
+    location: string;
+    urgency: 'emergency' | 'urgent' | 'routine';
+  } | null>(null);
 
   useEffect(() => {
     // Get search data from previous page
     const symptomData = sessionStorage.getItem('symptomData');
     if (symptomData) {
       const data = JSON.parse(symptomData);
+      setSearchParams({ location: data.location, urgency: data.urgency });
+      setFilters(prev => ({ ...prev, insurance: data.insurance || 'any' }));
       searchClinics({
         location: data.location,
         specialty: 'any',
-        insurance: data.insurance,
+        insurance: data.insurance || 'any',
         urgency: data.urgency,
-        maxDistance: 10
+        maxDistance: 10,
+        minRating: 0
       });
     }
   }, [searchClinics]);
+
+  useEffect(() => {
+    if (searchParams) {
+      searchClinics({
+        location: searchParams.location,
+        specialty: filters.specialty,
+        insurance: filters.insurance,
+        urgency: searchParams.urgency,
+        maxDistance: filters.maxDistance,
+        minRating: filters.minRating
+      });
+    }
+  }, [filters, searchClinics, searchParams]);
 
   const handleBooking = (clinic: Clinic) => {
     setSelectedClinic(clinic);
