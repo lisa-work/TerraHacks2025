@@ -1,17 +1,20 @@
-import { createClient } from 'redis';
+import { createClient, RedisClientType } from 'redis';
 
-let redisClient: any;
+let redisClient: RedisClientType | null = null;
 
 export const connectRedis = async (): Promise<void> => {
+  const redisUrl = process.env.REDIS_URL;
+  if (!redisUrl) {
+    console.log('ℹ️ REDIS_URL not set, skipping Redis connection');
+    return;
+  }
   try {
-    const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
-    
     redisClient = createClient({
       url: redisUrl
     });
 
-    redisClient.on('error', (error: any) => {
-      console.error('❌ Redis connection error:', error);
+    redisClient.on('error', (error: unknown) => {
+      console.warn('⚠️ Redis connection issue:', error);
     });
 
     redisClient.on('connect', () => {
@@ -37,12 +40,12 @@ export const connectRedis = async (): Promise<void> => {
   }
 };
 
-export const getRedisClient = () => {
+export const getRedisClient = (): RedisClientType | null => {
   return redisClient;
 };
 
 // Cache utility functions
-export const setCache = async (key: string, value: any, expireInSeconds: number = 3600): Promise<void> => {
+export const setCache = async (key: string, value: unknown, expireInSeconds = 3600): Promise<void> => {
   try {
     if (redisClient && redisClient.isReady) {
       await redisClient.setEx(key, expireInSeconds, JSON.stringify(value));
@@ -52,7 +55,7 @@ export const setCache = async (key: string, value: any, expireInSeconds: number 
   }
 };
 
-export const getCache = async (key: string): Promise<any> => {
+export const getCache = async (key: string): Promise<unknown> => {
   try {
     if (redisClient && redisClient.isReady) {
       const cached = await redisClient.get(key);
