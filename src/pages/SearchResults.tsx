@@ -35,17 +35,36 @@ const SearchResults: React.FC = () => {
     const symptomData = sessionStorage.getItem('symptomData');
     if (symptomData) {
       const data = JSON.parse(symptomData);
-      setSearchParams({ location: data.location, urgency: data.urgency, coordinates: data.coordinates });
-      setFilters(prev => ({ ...prev, insurance: data.insurance || 'any' }));
-      searchClinics({
-        location: data.location,
-        userLocation: data.coordinates,
-        specialty: 'any',
-        insurance: data.insurance || 'any',
-        urgency: data.urgency,
-        maxDistance: 10,
-        minRating: 0
-      });
+      const runSearch = (coords?: { lat: number; lng: number }) => {
+        setSearchParams({ location: data.location, urgency: data.urgency, coordinates: coords });
+        setFilters(prev => ({ ...prev, insurance: data.insurance || 'any' }));
+        searchClinics({
+          location: data.location,
+          userLocation: coords,
+          specialty: 'any',
+          insurance: data.insurance || 'any',
+          urgency: data.urgency,
+          maxDistance: 10,
+          minRating: 0
+        });
+      };
+
+      if (data.coordinates) {
+        runSearch(data.coordinates);
+      } else if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const coords = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            };
+            runSearch(coords);
+          },
+          () => runSearch(undefined)
+        );
+      } else {
+        runSearch(undefined);
+      }
     }
   }, [searchClinics]);
 

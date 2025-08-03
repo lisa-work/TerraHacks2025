@@ -103,6 +103,18 @@ const TriageResults: React.FC = () => {
     return 'Within 1-2 weeks';
   };
 
+  const parseSelfCareAdvice = (text: string) => {
+    const sections = text.split(/(?=Do:|Avoid:|Drink:|Eat:)/);
+    const result: Record<string, string> = {};
+    sections.forEach((section) => {
+      const [title, ...rest] = section.split(':');
+      if (rest.length > 0) {
+        result[title.trim().toLowerCase()] = rest.join(':').trim();
+      }
+    });
+    return result;
+  };
+
   const getSelfCareAdvice = (data: SymptomData): string => {
     const symptoms = data.symptoms.toLowerCase();
     if (symptoms.includes('cut') || symptoms.includes('bleeding')) {
@@ -254,7 +266,33 @@ const TriageResults: React.FC = () => {
             <Shield className="w-6 h-6 text-[#1D6FA3]" />
             <span>Self-Care Suggestions</span>
           </h3>
-          <p className="text-gray-700">{triageResult.selfCare}</p>
+          {(() => {
+            const sections = parseSelfCareAdvice(triageResult.selfCare);
+            return (
+              <ul className="list-disc pl-6 text-gray-700 space-y-1">
+                {sections.do && (
+                  <li>
+                    <strong>Do:</strong> {sections.do}
+                  </li>
+                )}
+                {sections.avoid && (
+                  <li>
+                    <strong>Avoid:</strong> {sections.avoid}
+                  </li>
+                )}
+                {sections.drink && (
+                  <li>
+                    <strong>Drink:</strong> {sections.drink}
+                  </li>
+                )}
+                {sections.eat && (
+                  <li>
+                    <strong>Eat:</strong> {sections.eat}
+                  </li>
+                )}
+              </ul>
+            );
+          })()}
         </div>
 
         {/* Emergency Actions */}

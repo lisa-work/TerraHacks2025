@@ -91,18 +91,25 @@ const SymptomForm: React.FC = () => {
     }
   }, [user]);
 
-  // Attempt to auto-detect user location if not already set
+  // Attempt to auto-detect user location with detailed address
   useEffect(() => {
-    if ((!formData.location || !formData.coordinates) && navigator.geolocation) {
+    if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(async (position) => {
         try {
           const { latitude, longitude } = position.coords;
-          const response = await fetch(`${API_BASE_URL}/location/reverse-geocode?lat=${latitude}&lng=${longitude}`);
+          const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`);
           const data = await response.json();
-          if (data.success && data.address) {
+          if (data && data.address) {
+            const detailed = [
+              data.address.road,
+              data.address.city || data.address.town || data.address.village,
+              data.address.state,
+              data.address.country,
+              data.address.postcode
+            ].filter(Boolean).join(', ');
             setFormData(prev => ({
               ...prev,
-              location: data.address,
+              location: detailed,
               coordinates: { lat: latitude, lng: longitude }
             }));
           }
@@ -113,7 +120,7 @@ const SymptomForm: React.FC = () => {
         console.error('Geolocation error:', error);
       });
     }
-  }, [formData.location, formData.coordinates]);
+  }, []);
 
   // Geocode address when location changes
   useEffect(() => {
@@ -121,14 +128,14 @@ const SymptomForm: React.FC = () => {
     const timer = setTimeout(async () => {
       if (formData.location) {
         try {
-          const response = await fetch(`${API_BASE_URL}/location/geocode?address=${encodeURIComponent(formData.location)}`, {
+          const response = await fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&q=${encodeURIComponent(formData.location)}`, {
             signal: controller.signal
           });
           const data = await response.json();
-          if (data.success && data.location) {
+          if (data && data[0]) {
             setFormData(prev => ({
               ...prev,
-              coordinates: { lat: data.location.lat, lng: data.location.lng }
+              coordinates: { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) }
             }));
           }
         } catch (err) {
