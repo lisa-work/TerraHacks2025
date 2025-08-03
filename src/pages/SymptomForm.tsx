@@ -139,7 +139,9 @@ const SymptomForm: React.FC = () => {
             }));
           }
         } catch (err) {
-          console.error('Failed to geocode address', err);
+          if ((err as Error).name !== 'AbortError') {
+            console.error('Failed to geocode address', err);
+          }
         }
       }
     }, 500);
