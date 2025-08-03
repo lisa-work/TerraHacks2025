@@ -15,6 +15,7 @@ import {
   Filter
 } from 'lucide-react';
 import { useUser } from '../contexts/UserContext';
+import { Link } from 'react-router-dom';
 
 interface Appointment {
   id: string;
@@ -109,20 +110,20 @@ const Dashboard: React.FC = () => {
         </div>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-xl shadow-sm p-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8 ">
+          <div className="bg-white rounded-xl shadow-sm hover:shadow-lg p-6">
             <div className="flex items-center space-x-3">
               <div className="p-2 bg-[#1D6FA3]/10 rounded-lg">
                 <Calendar className="w-6 h-6 text-[#1D6FA3]" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-gray-900">{upcomingAppointments.length}</p>
+                <p className="text-2xl font-bold text-gray-900 ">{upcomingAppointments.length}</p>
                 <p className="text-sm text-gray-600">Upcoming</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm p-6">
+          <div className="bg-white rounded-xl shadow-sm hover:shadow-lg p-6">
             <div className="flex items-center space-x-3">
               <div className="p-2 bg-green-100 rounded-lg">
                 <FileText className="w-6 h-6 text-green-600" />
@@ -134,7 +135,7 @@ const Dashboard: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm p-6">
+          <div className="bg-white rounded-xl shadow-sm hover:shadow-lg p-6">
             <div className="flex items-center space-x-3">
               <div className="p-2 bg-purple-100 rounded-lg">
                 <CreditCard className="w-6 h-6 text-purple-600" />
@@ -146,7 +147,7 @@ const Dashboard: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm p-6">
+          <div className="bg-white rounded-xl shadow-sm hover:shadow-lg p-6">
             <div className="flex items-center space-x-3">
               <div className="p-2 bg-orange-100 rounded-lg">
                 <Star className="w-6 h-6 text-orange-600" />
@@ -196,10 +197,12 @@ const Dashboard: React.FC = () => {
                   <div>
                     <div className="flex items-center justify-between mb-6">
                       <h2 className="text-xl font-bold text-gray-900">Upcoming Appointments</h2>
-                      <button className="flex items-center space-x-2 bg-[#1D6FA3] text-white px-4 py-2 rounded-lg hover:bg-[#1D6FA3]/80 transition-colors">
-                        <Plus className="w-4 h-4" />
-                        <span>Book New</span>
-                      </button>
+                      <Link to="/symptoms">
+                        <button className="flex items-center space-x-2 bg-[#1D6FA3] text-white px-4 py-2 rounded-lg hover:bg-[#1D6FA3]/80 transition-colors">
+                          <Plus className="w-4 h-4" />
+                          <span>Book New</span>
+                        </button>
+                      </Link>
                     </div>
 
                     <div className="space-y-4">
@@ -240,9 +243,6 @@ const Dashboard: React.FC = () => {
                             </div>
                             
                             <div className="flex items-center space-x-2">
-                              <button className="p-2 text-gray-400 hover:text-blue-600 transition-colors">
-                                <Phone className="w-4 h-4" />
-                              </button>
                               <button className="p-2 text-gray-400 hover:text-blue-600 transition-colors">
                                 <ChevronRight className="w-4 h-4" />
                               </button>
@@ -423,10 +423,12 @@ const Dashboard: React.FC = () => {
               <div className="bg-white rounded-xl shadow-sm p-6">
                 <h3 className="font-semibold text-gray-900 mb-4">Quick Actions</h3>
                 <div className="space-y-3">
-                  <button className="w-full flex items-center space-x-3 p-3 text-left border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-                    <Plus className="w-5 h-5 text-[#1D6FA3]" />
-                    <span className="text-sm font-medium text-gray-900">Book Appointment</span>
-                  </button>
+                  <Link to="/symptoms">
+                    <button className="w-full flex items-center space-x-3 p-3 text-left border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                      <Plus className="w-5 h-5 text-[#1D6FA3]" />
+                      <span className="text-sm font-medium text-gray-900">Book Appointment</span>
+                    </button>
+                  </Link>
                   <button className="w-full flex items-center space-x-3 p-3 text-left border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
                     <FileText className="w-5 h-5 text-green-600" />
                     <span className="text-sm font-medium text-gray-900">View Records</span>
