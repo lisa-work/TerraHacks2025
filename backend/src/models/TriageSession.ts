@@ -71,8 +71,7 @@ const TriageSessionSchema = new Schema<ITriageSession>({
   sessionId: {
     type: String,
     required: [true, 'Session ID is required'],
-    unique: true,
-    index: true
+    unique: true
   },
   symptoms: [{
     type: String,
@@ -284,7 +283,6 @@ const TriageSessionSchema = new Schema<ITriageSession>({
 });
 
 // Indexes for better performance
-TriageSessionSchema.index({ sessionId: 1 });
 TriageSessionSchema.index({ user: 1, createdAt: -1 });
 TriageSessionSchema.index({ 'aiAnalysis.urgency': 1 });
 TriageSessionSchema.index({ 'recommendations.careType': 1 });

@@ -29,7 +29,7 @@ export const connectRedis = async (): Promise<void> => {
 
     // Graceful shutdown
     process.on('SIGINT', async () => {
-      await redisClient.quit();
+      await redisClient?.quit();
       console.log('📤 Redis connection closed due to app termination');
     });
 

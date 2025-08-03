@@ -25,8 +25,14 @@ const appointment_1 = __importDefault(require("./routes/appointment"));
 const triage_1 = __importDefault(require("./routes/triage"));
 const medicalHistory_1 = __importDefault(require("./routes/medicalHistory"));
 const notification_1 = __importDefault(require("./routes/notification"));
-dotenv_1.default.config({ path: path_1.default.resolve(__dirname, '../../.env') });
-console.log('Loaded GOOGLE_MAPS_API_KEY:', process.env.GOOGLE_MAPS_API_KEY);
+dotenv_1.default.config({ path: path_1.default.resolve(__dirname, '../.env') });
+const googleMapsApiKey = process.env.GOOGLE_MAPS_API_KEY;
+if (googleMapsApiKey) {
+    console.log('GOOGLE_MAPS_API_KEY loaded');
+}
+else {
+    console.warn('GOOGLE_MAPS_API_KEY environment variable is not set. Maps features will be disabled.');
+}
 const app = (0, express_1.default)();
 const server = (0, http_1.createServer)(app);
 const io = new socket_io_1.Server(server, {
@@ -85,10 +91,12 @@ const startServer = async () => {
     try {
         await (0, database_1.connectDatabase)();
         await (0, redis_1.connectRedis)();
+        const environment = process.env.NODE_ENV || 'development';
+        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
         server.listen(PORT, () => {
             console.log(`🚀 Server running on port ${PORT}`);
-            console.log(`📊 Environment: ${process.env.NODE_ENV}`);
-            console.log(`🔗 Frontend URL: ${process.env.FRONTEND_URL}`);
+            console.log(`📊 Environment: ${environment}`);
+            console.log(`🔗 Frontend URL: ${frontendUrl}`);
         });
     }
     catch (error) {

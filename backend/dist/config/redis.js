@@ -2,15 +2,19 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteCache = exports.getCache = exports.setCache = exports.getRedisClient = exports.connectRedis = void 0;
 const redis_1 = require("redis");
-let redisClient;
+let redisClient = null;
 const connectRedis = async () => {
+    const redisUrl = process.env.REDIS_URL;
+    if (!redisUrl) {
+        console.log('ℹ️ REDIS_URL not set, skipping Redis connection');
+        return;
+    }
     try {
-        const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
         redisClient = (0, redis_1.createClient)({
             url: redisUrl
         });
         redisClient.on('error', (error) => {
-            console.error('❌ Redis connection error:', error);
+            console.warn('⚠️ Redis connection issue:', error);
         });
         redisClient.on('connect', () => {
             console.log('✅ Redis connected successfully');
@@ -20,7 +24,7 @@ const connectRedis = async () => {
         });
         await redisClient.connect();
         process.on('SIGINT', async () => {
-            await redisClient.quit();
+            await redisClient?.quit();
             console.log('📤 Redis connection closed due to app termination');
         });
     }
