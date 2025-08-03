@@ -94,7 +94,10 @@ const optionalAuth = async (req: AuthRequest, res: Response, next: NextFunction)
       try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
         const user = await User.findById(decoded.id);
-        if (user && user.isVerified) {
+        if (user) {
+          // Allow access even if the user's email isn't verified
+          // This prevents 401 errors for users who haven't completed
+          // the verification process yet.
           req.user = user;
         }
       } catch (error) {

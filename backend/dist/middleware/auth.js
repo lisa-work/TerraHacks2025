@@ -30,12 +30,6 @@ const protect = async (req, res, next) => {
                     error: 'Not authorized to access this resource'
                 });
             }
-            if (!user.isVerified) {
-                return res.status(401).json({
-                    success: false,
-                    error: 'Please verify your email to access this resource'
-                });
-            }
             req.user = user;
             next();
         }
@@ -76,7 +70,7 @@ const optionalAuth = async (req, res, next) => {
             try {
                 const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);
                 const user = await User_1.default.findById(decoded.id);
-                if (user && user.isVerified) {
+                if (user) {
                     req.user = user;
                 }
             }
