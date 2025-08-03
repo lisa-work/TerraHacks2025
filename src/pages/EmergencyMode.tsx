@@ -136,7 +136,7 @@ const EmergencyMode: React.FC = () => {
             </button>
             
             <button
-              onClick={() => window.open('https://www.redcross.org/get-help/how-to-prepare-for-emergencies/mobile-apps', '_blank')}
+              onClick={() => window.open('https://www.redcross.org/take-a-class/first-aid/performing-first-aid/first-aid-steps?srsltid=AfmBOopFHlECoY3kCa1D5MjWRc2TpwJuhyDhkM-c0ITlMjX62pU-GGXU', '_blank')}
               className="flex items-center justify-center space-x-3 bg-[#1D6FA3] text-white p-4 rounded-lg hover:bg-[#1D6FA3]/80 transition-colors font-semibold"
             >
               <Heart className="w-6 h-6" />
