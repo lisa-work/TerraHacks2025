@@ -1,4 +1,5 @@
 import { GoogleGenerativeAI, GenerativeModel } from '@google/generative-ai';
+import '../config/env';
 
 interface SymptomData {
   symptoms: string[];

@@ -1,3 +1,4 @@
+import '../config/env';
 interface SymptomData {
     symptoms: string[];
     symptomDescription: string;

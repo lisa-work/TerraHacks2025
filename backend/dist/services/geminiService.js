@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const generative_ai_1 = require("@google/generative-ai");
+require("../config/env");
 class GeminiService {
     constructor() {
         this.isConfigured = false;
