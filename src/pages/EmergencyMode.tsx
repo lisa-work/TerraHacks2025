@@ -44,6 +44,10 @@ const EmergencyMode: React.FC = () => {
 
           try {
             const response = await fetch(`${API_BASE_URL}/location/emergency?lat=${coords.lat}&lng=${coords.lng}`);
+            if (!response.ok) {
+              console.error('Emergency facilities request failed:', response.status);
+              return;
+            }
             const data = await response.json();
             if (data.success) {
               setEmergencyFacilities(data.facilities);
