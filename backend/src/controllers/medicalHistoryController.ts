@@ -22,7 +22,7 @@ const decryptSensitiveData = (encryptedData: string): string => {
 // @desc    Get medical history
 // @route   GET /api/medical-history
 // @access  Private
-export const getMedicalHistory = async (req: AuthRequest, res: Response, next: NextFunction) => {
+export const getMedicalHistory = async (req: AuthRequest, res: Response, next: NextFunction): Promise<any> => {
   try {
     const user = await User.findById(req.user?._id);
 
@@ -45,7 +45,7 @@ export const getMedicalHistory = async (req: AuthRequest, res: Response, next: N
 // @desc    Update medical history
 // @route   PUT /api/medical-history
 // @access  Private
-export const updateMedicalHistory = async (req: AuthRequest, res: Response, next: NextFunction) => {
+export const updateMedicalHistory = async (req: AuthRequest, res: Response, next: NextFunction): Promise<any> => {
   try {
     const {
       allergies,
@@ -95,7 +95,7 @@ export const updateMedicalHistory = async (req: AuthRequest, res: Response, next
 // @desc    Add allergy
 // @route   POST /api/medical-history/allergies
 // @access  Private
-export const addAllergy = async (req: AuthRequest, res: Response, next: NextFunction) => {
+export const addAllergy = async (req: AuthRequest, res: Response, next: NextFunction): Promise<any> => {
   try {
     const { allergy } = req.body;
 
@@ -140,7 +140,7 @@ export const addAllergy = async (req: AuthRequest, res: Response, next: NextFunc
 // @desc    Remove allergy
 // @route   DELETE /api/medical-history/allergies/:allergy
 // @access  Private
-export const removeAllergy = async (req: AuthRequest, res: Response, next: NextFunction) => {
+export const removeAllergy = async (req: AuthRequest, res: Response, next: NextFunction): Promise<any> => {
   try {
     const { allergy } = req.params;
 
@@ -170,7 +170,7 @@ export const removeAllergy = async (req: AuthRequest, res: Response, next: NextF
 // @desc    Add medication
 // @route   POST /api/medical-history/medications
 // @access  Private
-export const addMedication = async (req: AuthRequest, res: Response, next: NextFunction) => {
+export const addMedication = async (req: AuthRequest, res: Response, next: NextFunction): Promise<any> => {
   try {
     const { name, dosage, frequency, startDate, endDate, prescribedBy } = req.body;
 
@@ -216,7 +216,7 @@ export const addMedication = async (req: AuthRequest, res: Response, next: NextF
 // @desc    Update medication
 // @route   PUT /api/medical-history/medications/:id
 // @access  Private
-export const updateMedication = async (req: AuthRequest, res: Response, next: NextFunction) => {
+export const updateMedication = async (req: AuthRequest, res: Response, next: NextFunction): Promise<any> => {
   try {
     const { id } = req.params;
     const { name, dosage, frequency, startDate, endDate, prescribedBy } = req.body;
@@ -230,7 +230,7 @@ export const updateMedication = async (req: AuthRequest, res: Response, next: Ne
       });
     }
 
-    const medicationIndex = user.medicalHistory.medications.findIndex(m => m._id?.toString() === id);
+    const medicationIndex = user.medicalHistory.medications.findIndex(m => (m as any)._id?.toString() === id);
 
     if (medicationIndex === -1) {
       return res.status(404).json({
@@ -263,7 +263,7 @@ export const updateMedication = async (req: AuthRequest, res: Response, next: Ne
 // @desc    Remove medication
 // @route   DELETE /api/medical-history/medications/:id
 // @access  Private
-export const removeMedication = async (req: AuthRequest, res: Response, next: NextFunction) => {
+export const removeMedication = async (req: AuthRequest, res: Response, next: NextFunction): Promise<any> => {
   try {
     const { id } = req.params;
 
@@ -276,7 +276,7 @@ export const removeMedication = async (req: AuthRequest, res: Response, next: Ne
       });
     }
 
-    user.medicalHistory.medications = user.medicalHistory.medications.filter(m => m._id?.toString() !== id);
+    user.medicalHistory.medications = user.medicalHistory.medications.filter(m => (m as any)._id?.toString() !== id);
     user.medicalHistory.lastUpdated = new Date();
 
     await user.save();
@@ -293,7 +293,7 @@ export const removeMedication = async (req: AuthRequest, res: Response, next: Ne
 // @desc    Add medical condition
 // @route   POST /api/medical-history/conditions
 // @access  Private
-export const addCondition = async (req: AuthRequest, res: Response, next: NextFunction) => {
+export const addCondition = async (req: AuthRequest, res: Response, next: NextFunction): Promise<any> => {
   try {
     const { name, diagnosedDate, status, notes } = req.body;
 
@@ -337,7 +337,7 @@ export const addCondition = async (req: AuthRequest, res: Response, next: NextFu
 // @desc    Update medical condition
 // @route   PUT /api/medical-history/conditions/:id
 // @access  Private
-export const updateCondition = async (req: AuthRequest, res: Response, next: NextFunction) => {
+export const updateCondition = async (req: AuthRequest, res: Response, next: NextFunction): Promise<any> => {
   try {
     const { id } = req.params;
     const { name, diagnosedDate, status, notes } = req.body;
@@ -351,7 +351,7 @@ export const updateCondition = async (req: AuthRequest, res: Response, next: Nex
       });
     }
 
-    const conditionIndex = user.medicalHistory.conditions.findIndex(c => c._id?.toString() === id);
+    const conditionIndex = user.medicalHistory.conditions.findIndex(c => (c as any)._id?.toString() === id);
 
     if (conditionIndex === -1) {
       return res.status(404).json({
@@ -382,7 +382,7 @@ export const updateCondition = async (req: AuthRequest, res: Response, next: Nex
 // @desc    Remove medical condition
 // @route   DELETE /api/medical-history/conditions/:id
 // @access  Private
-export const removeCondition = async (req: AuthRequest, res: Response, next: NextFunction) => {
+export const removeCondition = async (req: AuthRequest, res: Response, next: NextFunction): Promise<any> => {
   try {
     const { id } = req.params;
 
@@ -395,7 +395,7 @@ export const removeCondition = async (req: AuthRequest, res: Response, next: Nex
       });
     }
 
-    user.medicalHistory.conditions = user.medicalHistory.conditions.filter(c => c._id?.toString() !== id);
+    user.medicalHistory.conditions = user.medicalHistory.conditions.filter(c => (c as any)._id?.toString() !== id);
     user.medicalHistory.lastUpdated = new Date();
 
     await user.save();

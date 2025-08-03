@@ -172,7 +172,7 @@ class MapsService {
         params: {
           origins: params.origins,
           destinations: params.destinations,
-          units: params.units || 'metric',
+          units: (params.units || 'metric') as any,
           key: process.env.GOOGLE_MAPS_API_KEY!
         }
       });

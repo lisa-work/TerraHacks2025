@@ -5,7 +5,7 @@ import { AuthRequest } from '../middleware/auth';
 // @desc    Update user profile
 // @route   PUT /api/users/profile
 // @access  Private
-export const updateProfile = async (req: AuthRequest, res: Response, next: NextFunction) => {
+export const updateProfile = async (req: AuthRequest, res: Response, next: NextFunction): Promise<any> => {
   try {
     const {
       name,
@@ -49,7 +49,7 @@ export const updateProfile = async (req: AuthRequest, res: Response, next: NextF
 // @desc    Get user profile
 // @route   GET /api/users/profile
 // @access  Private
-export const getProfile = async (req: AuthRequest, res: Response, next: NextFunction) => {
+export const getProfile = async (req: AuthRequest, res: Response, next: NextFunction): Promise<any> => {
   try {
     const user = await User.findById(req.user?._id);
 
@@ -72,7 +72,7 @@ export const getProfile = async (req: AuthRequest, res: Response, next: NextFunc
 // @desc    Delete user account
 // @route   DELETE /api/users/profile
 // @access  Private
-export const deleteAccount = async (req: AuthRequest, res: Response, next: NextFunction) => {
+export const deleteAccount = async (req: AuthRequest, res: Response, next: NextFunction): Promise<any> => {
   try {
     const user = await User.findById(req.user?._id);
 
