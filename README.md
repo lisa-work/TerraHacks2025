@@ -1,5 +1,5 @@
-🏥 # WaitlessOS – Your AI-Powered Healthcare Companion
-💡 ## Inspiration 
+# 🏥 WaitlessOS – Your AI-Powered Healthcare Companion
+## 💡  Inspiration 
 
 As an international students, we often hesitated to visit a clinic or hospital in Canada. Unlike permanent residents with OHIP, we have UHIP or private plans that aren’t accepted everywhere, and coverage varies greatly. we constantly asking:
 
