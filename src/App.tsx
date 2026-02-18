@@ -11,6 +11,7 @@ import SearchResults from './pages/SearchResults';
 import BookingPage from './pages/BookingPage';
 import Dashboard from './pages/Dashboard';
 import EmergencyMode from './pages/EmergencyMode';
+import Toaster from './components/ui/Toaster';
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
                 <Route path="/emergency" element={<EmergencyMode />} />
               </Routes>
             </main>
+            <Toaster />
           </div>
         </Router>
       </ClinicProvider>

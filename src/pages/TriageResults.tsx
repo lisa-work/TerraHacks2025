@@ -18,6 +18,12 @@ interface TriageResult {
   careType: string;
   timeframe: string;
   confidence: number;
+  selfCare: string;
+}
+
+interface SymptomData {
+  symptoms: string;
+  severity: number;
 }
 
 const TriageResults: React.FC = () => {
@@ -34,34 +40,52 @@ const TriageResults: React.FC = () => {
     }
 
     const data = JSON.parse(symptomData);
-    
+
     // Mock AI triage analysis based on symptoms
     setTimeout(() => {
+      const inferredUrgency = determineUrgency(data);
+
+      // Update stored symptom data with AI-assessed urgency
+      data.urgency = inferredUrgency;
+      sessionStorage.setItem('symptomData', JSON.stringify(data));
+
       const mockResult: TriageResult = {
-        urgency: data.urgency,
-        recommendation: getRecommendation(data),
+        urgency: inferredUrgency,
+        recommendation: getRecommendation(inferredUrgency),
         reasoning: getReasoning(data),
-        careType: getCareType(data),
-        timeframe: getTimeframe(data),
-        confidence: 89
+        careType: getCareType(inferredUrgency),
+        timeframe: getTimeframe(inferredUrgency),
+        confidence: 89,
+        selfCare: getSelfCareAdvice(data)
       };
-      
+
       setTriageResult(mockResult);
       setLoading(false);
     }, 3000);
   }, [navigate]);
 
-  const getRecommendation = (data: any): string => {
-    if (data.severity >= 8 || data.urgency === 'emergency') {
+  const determineUrgency = (data: SymptomData): 'emergency' | 'urgent' | 'routine' => {
+    const symptoms = data.symptoms.toLowerCase();
+    if (symptoms.includes('chest pain') || symptoms.includes('difficulty breathing')) {
+      return 'emergency';
+    }
+    if (data.severity >= 7) {
+      return 'urgent';
+    }
+    return 'routine';
+  };
+
+  const getRecommendation = (urgency: string): string => {
+    if (urgency === 'emergency') {
       return 'Seek immediate emergency care';
-    } else if (data.severity >= 6 || data.urgency === 'urgent') {
+    } else if (urgency === 'urgent') {
       return 'Visit urgent care within 24 hours';
     } else {
       return 'Schedule routine appointment with primary care';
     }
   };
 
-  const getReasoning = (data: any): string => {
+  const getReasoning = (data: SymptomData): string => {
     const symptoms = data.symptoms.toLowerCase();
     if (symptoms.includes('chest pain') || symptoms.includes('difficulty breathing')) {
       return 'Symptoms suggest potential cardiovascular or respiratory issues that require immediate attention.';
@@ -72,16 +96,45 @@ const TriageResults: React.FC = () => {
     }
   };
 
-  const getCareType = (data: any): string => {
-    if (data.urgency === 'emergency') return 'Emergency Room';
-    if (data.urgency === 'urgent') return 'Urgent Care Center';
+  const getCareType = (urgency: string): string => {
+    if (urgency === 'emergency') return 'Emergency Room';
+    if (urgency === 'urgent') return 'Urgent Care Center';
     return 'Primary Care Clinic';
   };
 
-  const getTimeframe = (data: any): string => {
-    if (data.urgency === 'emergency') return 'Immediate';
-    if (data.urgency === 'urgent') return 'Within 24 hours';
+  const getTimeframe = (urgency: string): string => {
+    if (urgency === 'emergency') return 'Immediate';
+    if (urgency === 'urgent') return 'Within 24 hours';
     return 'Within 1-2 weeks';
+  };
+
+  const parseSelfCareAdvice = (text: string) => {
+    const sections = text.split(/(?=Do:|Avoid:|Drink:|Eat:)/);
+    const result: Record<string, string> = {};
+    sections.forEach((section) => {
+      const [title, ...rest] = section.split(':');
+      if (rest.length > 0) {
+        result[title.trim().toLowerCase()] = rest.join(':').trim();
+      }
+    });
+    return result;
+  };
+
+  const getSelfCareAdvice = (data: SymptomData): string => {
+    const symptoms = data.symptoms.toLowerCase();
+    if (symptoms.includes('cut') || symptoms.includes('bleeding')) {
+      return 'Do: Rinse the wound with clean water, apply gentle pressure to stop bleeding, and cover with a sterile bandage. Avoid: using harsh chemicals like hydrogen peroxide on deep cuts. Drink: plenty of water to stay hydrated. Eat: foods rich in vitamin C and protein to support healing.';
+    }
+    if (symptoms.includes('sprain') || symptoms.includes('swelling')) {
+      return 'Do: Rest the injured area, apply ice wrapped in a cloth for 20 minutes, compress with an elastic bandage, and keep it elevated. Avoid: putting weight on the injury until the pain subsides. Drink: water or electrolyte beverages to reduce inflammation.';
+    }
+    if (symptoms.includes('fever')) {
+      return 'Do: Rest, wear light clothing, and take acetaminophen or ibuprofen as directed. Avoid: excessive physical activity and alcohol. Drink: water, clear broths, or oral rehydration solutions. Eat: light meals like soups or fruits if you have an appetite.';
+    }
+    if (symptoms.includes('headache')) {
+      return 'Do: Rest in a quiet, dark room and use a cold compress on your forehead. Avoid: excessive screen time and loud environments. Drink: water or herbal teas. Eat: small, light meals and avoid skipping meals.';
+    }
+    return 'Do: Rest and monitor your symptoms. Avoid: strenuous activity. Drink: water regularly. Eat: balanced meals to maintain energy. Seek medical care if symptoms worsen or do not improve.';
   };
 
   const getUrgencyColor = (urgency: string) => {
@@ -210,6 +263,41 @@ const TriageResults: React.FC = () => {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Self-Care Advice */}
+        <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
+          <h3 className="text-xl font-bold text-gray-900 mb-2 flex items-center space-x-2">
+            <Shield className="w-6 h-6 text-[#1D6FA3]" />
+            <span>Self-Care Suggestions</span>
+          </h3>
+          {(() => {
+            const sections = parseSelfCareAdvice(triageResult.selfCare);
+            return (
+              <ul className="list-disc pl-6 text-gray-700 space-y-1">
+                {sections.do && (
+                  <li>
+                    <strong>Do:</strong> {sections.do}
+                  </li>
+                )}
+                {sections.avoid && (
+                  <li>
+                    <strong>Avoid:</strong> {sections.avoid}
+                  </li>
+                )}
+                {sections.drink && (
+                  <li>
+                    <strong>Drink:</strong> {sections.drink}
+                  </li>
+                )}
+                {sections.eat && (
+                  <li>
+                    <strong>Eat:</strong> {sections.eat}
+                  </li>
+                )}
+              </ul>
+            );
+          })()}
         </div>
 
         {/* Emergency Actions */}

@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  MapPin, 
-  Star, 
-  Clock, 
-  Phone, 
-  Shield, 
+import {
+  MapPin,
+  Star,
+  Phone,
+  Shield,
   Filter,
   ChevronDown,
   Navigation,
@@ -25,21 +24,63 @@ const SearchResults: React.FC = () => {
     insurance: 'any',
     specialty: 'any'
   });
+  const [searchParams, setSearchParams] = useState<{
+    location: string;
+    coordinates?: { lat: number; lng: number };
+    urgency: 'emergency' | 'urgent' | 'routine';
+  } | null>(null);
 
   useEffect(() => {
     // Get search data from previous page
     const symptomData = sessionStorage.getItem('symptomData');
     if (symptomData) {
       const data = JSON.parse(symptomData);
-      searchClinics({
-        location: data.location,
-        specialty: 'any',
-        insurance: data.insurance,
-        urgency: data.urgency,
-        maxDistance: 10
-      });
+      const runSearch = (coords?: { lat: number; lng: number }) => {
+        setSearchParams({ location: data.location, urgency: data.urgency, coordinates: coords });
+        setFilters(prev => ({ ...prev, insurance: data.insurance || 'any' }));
+        searchClinics({
+          location: data.location,
+          userLocation: coords,
+          specialty: 'any',
+          insurance: data.insurance || 'any',
+          urgency: data.urgency,
+          maxDistance: 10,
+          minRating: 0
+        });
+      };
+
+      if (data.coordinates) {
+        runSearch(data.coordinates);
+      } else if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const coords = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            };
+            runSearch(coords);
+          },
+          () => runSearch(undefined)
+        );
+      } else {
+        runSearch(undefined);
+      }
     }
   }, [searchClinics]);
+
+  useEffect(() => {
+    if (searchParams) {
+      searchClinics({
+        location: searchParams.location,
+        userLocation: searchParams.coordinates,
+        specialty: filters.specialty,
+        insurance: filters.insurance,
+        urgency: searchParams.urgency,
+        maxDistance: filters.maxDistance,
+        minRating: filters.minRating
+      });
+    }
+  }, [filters, searchClinics, searchParams]);
 
   const handleBooking = (clinic: Clinic) => {
     setSelectedClinic(clinic);

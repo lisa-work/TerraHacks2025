@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { 
+import {
   Calendar, 
   Clock, 
   MapPin, 
@@ -17,12 +17,17 @@ import {
 } from 'lucide-react';
 import { useClinics } from '../contexts/ClinicContext';
 import { useUser } from '../contexts/UserContext';
+import { toast } from 'react-toastify';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
 
 const BookingPage: React.FC = () => {
   const { clinicId } = useParams<{ clinicId: string }>();
   const navigate = useNavigate();
   const { clinics, selectedClinic } = useClinics();
   const { user, isAuthenticated } = useUser();
+  const symptomData = sessionStorage.getItem('symptomData');
+  const selectedInsurance = user?.insurance?.provider || (symptomData ? JSON.parse(symptomData).insurance : '');
   
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedTime, setSelectedTime] = useState('');
@@ -60,18 +65,40 @@ const BookingPage: React.FC = () => {
   const handleBooking = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isAuthenticated) {
-      // In a real app, this would trigger login modal
-      alert('Please sign in to book an appointment');
+      toast.error('Please sign in to book an appointment');
       return;
     }
 
     setIsBooking(true);
-    
-    // Simulate booking process
-    setTimeout(() => {
-      setIsBooking(false);
+
+    try {
+      const token = localStorage.getItem('mediconnect_token');
+      const response = await fetch(`${API_BASE_URL}/appointments`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          clinicId: clinic.id,
+          appointmentDate: selectedDate,
+          appointmentTime: selectedTime,
+          type: appointmentType,
+          notes
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Booking failed');
+      }
+
       setBookingComplete(true);
-    }, 2000);
+    } catch (err) {
+      console.error('Booking failed', err);
+      toast.error('Failed to book appointment');
+    } finally {
+      setIsBooking(false);
+    }
   };
 
   const availableDates = [
@@ -122,7 +149,7 @@ const BookingPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
           <button
@@ -304,7 +331,7 @@ const BookingPage: React.FC = () => {
                       <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
                         <Mail className="w-5 h-5 text-gray-400" />
                         <div>
-                          <div className="font-medium text-gray-900">{user.email}</div>
+                          <div className="font-medium text-sm text-gray-900">{user.email}</div>
                           <div className="text-sm text-gray-500">Email</div>
                         </div>
                       </div>
@@ -320,7 +347,7 @@ const BookingPage: React.FC = () => {
                       <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
                         <CreditCard className="w-5 h-5 text-gray-400" />
                         <div>
-                          <div className="font-medium text-gray-900">{user.insurance.provider}</div>
+                          <div className="font-medium text-gray-900">{selectedInsurance}</div>
                           <div className="text-sm text-gray-500">Insurance</div>
                         </div>
                       </div>

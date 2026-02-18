@@ -32,7 +32,7 @@ const Header: React.FC = () => {
               <Link to="/symptoms" className="text-gray-700 hover:text-[#1D6FA3] hover:font-medium hover:underline hover:underline-offset-2 transition-colors">
                 Find Care
               </Link>
-              <Link to="/emergency" className="text-red-600 hover:text-red-800 font-bold hover:underline hover:underline-offset-2 transition-colors">
+              <Link to="/emergency" className="text-red-600 hover:text-red-800 font-medium hover:underline hover:underline-offset-2 transition-colors">
                 Emergency
               </Link>
               

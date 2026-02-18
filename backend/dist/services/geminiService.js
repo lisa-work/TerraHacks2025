@@ -8,6 +8,8 @@ class GeminiService {
         if (!process.env.GEMINI_API_KEY) {
             console.warn('GEMINI_API_KEY environment variable is not set. Using fallback responses.');
             return;
+        } else {
+            console.log("✅ Gemini API initialized");
         }
         this.genAI = new generative_ai_1.GoogleGenerativeAI(process.env.GEMINI_API_KEY);
         this.model = this.genAI.getGenerativeModel({ model: "gemini-pro" });

@@ -1,20 +1,20 @@
-import React, { useState } from 'react';
-import { 
-  Calendar, 
-  Clock, 
-  MapPin, 
-  Phone, 
-  Star, 
+import React, { useState, useEffect } from 'react';
+import {
+  Calendar,
+  Clock,
+  MapPin,
+  Star,
   User,
   Bell,
   Settings,
   CreditCard,
   FileText,
   ChevronRight,
-  Plus,
-  Filter
+  Plus
 } from 'lucide-react';
 import { useUser } from '../contexts/UserContext';
+import { toast } from 'react-toastify';
+import { Link } from 'react-router-dom';
 
 interface Appointment {
   id: string;
@@ -29,15 +29,49 @@ interface Appointment {
 }
 
 const Dashboard: React.FC = () => {
-  const { user, isAuthenticated } = useUser();
+  const { user, isAuthenticated, updateUser } = useUser();
   const [activeTab, setActiveTab] = useState('appointments');
+  const [profile, setProfile] = useState({
+    name: user?.name || '',
+    email: user?.email || '',
+    phone: user?.phone || '',
+    location: user?.location?.address || '',
+    insuranceProvider: user?.insurance?.provider || '',
+    policyNumber: user?.insurance?.policyNumber || ''
+  });
+
+  useEffect(() => {
+    setProfile({
+      name: user?.name || '',
+      email: user?.email || '',
+      phone: user?.phone || '',
+      location: user?.location?.address || '',
+      insuranceProvider: user?.insurance?.provider || '',
+      policyNumber: user?.insurance?.policyNumber || ''
+    });
+  }, [user]);
+
+  const handleSaveProfile = async () => {
+    try {
+      await updateUser({
+        name: profile.name,
+        phone: profile.phone,
+        location: { ...user?.location, address: profile.location },
+        insurance: { ...user?.insurance, provider: profile.insuranceProvider, policyNumber: profile.policyNumber }
+      });
+      toast.success('Profile updated');
+    } catch (error) {
+      console.error(error);
+      toast.error('Failed to update profile');
+    }
+  };
 
   const mockAppointments: Appointment[] = [
     {
       id: '1',
       clinicName: 'Manhattan General Hospital',
       clinicAddress: '123 Medical Center Dr, New York, NY',
-      date: '2024-01-15',
+      date: '2025-09-15',
       time: '09:00',
       type: 'General Consultation',
       status: 'upcoming',
@@ -48,7 +82,7 @@ const Dashboard: React.FC = () => {
       id: '2',
       clinicName: 'CityMed Urgent Care',
       clinicAddress: '456 Health Plaza, New York, NY',
-      date: '2024-01-10',
+      date: '2025-8-10',
       time: '14:30',
       type: 'Follow-up',
       status: 'completed',
@@ -59,7 +93,7 @@ const Dashboard: React.FC = () => {
       id: '3',
       clinicName: 'Downtown Family Clinic',
       clinicAddress: '789 Wellness Ave, New York, NY',
-      date: '2024-01-20',
+      date: '2025-10-20',
       time: '11:00',
       type: 'Specialist Visit',
       status: 'upcoming',
@@ -109,20 +143,20 @@ const Dashboard: React.FC = () => {
         </div>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-xl shadow-sm p-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8 ">
+          <div className="bg-white rounded-xl shadow-sm hover:shadow-lg p-6">
             <div className="flex items-center space-x-3">
               <div className="p-2 bg-[#1D6FA3]/10 rounded-lg">
                 <Calendar className="w-6 h-6 text-[#1D6FA3]" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-gray-900">{upcomingAppointments.length}</p>
+                <p className="text-2xl font-bold text-gray-900 ">{upcomingAppointments.length}</p>
                 <p className="text-sm text-gray-600">Upcoming</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm p-6">
+          <div className="bg-white rounded-xl shadow-sm hover:shadow-lg p-6">
             <div className="flex items-center space-x-3">
               <div className="p-2 bg-green-100 rounded-lg">
                 <FileText className="w-6 h-6 text-green-600" />
@@ -134,7 +168,7 @@ const Dashboard: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm p-6">
+          <div className="bg-white rounded-xl shadow-sm hover:shadow-lg p-6">
             <div className="flex items-center space-x-3">
               <div className="p-2 bg-purple-100 rounded-lg">
                 <CreditCard className="w-6 h-6 text-purple-600" />
@@ -146,7 +180,7 @@ const Dashboard: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm p-6">
+          <div className="bg-white rounded-xl shadow-sm hover:shadow-lg p-6">
             <div className="flex items-center space-x-3">
               <div className="p-2 bg-orange-100 rounded-lg">
                 <Star className="w-6 h-6 text-orange-600" />
@@ -196,10 +230,12 @@ const Dashboard: React.FC = () => {
                   <div>
                     <div className="flex items-center justify-between mb-6">
                       <h2 className="text-xl font-bold text-gray-900">Upcoming Appointments</h2>
-                      <button className="flex items-center space-x-2 bg-[#1D6FA3] text-white px-4 py-2 rounded-lg hover:bg-[#1D6FA3]/80 transition-colors">
-                        <Plus className="w-4 h-4" />
-                        <span>Book New</span>
-                      </button>
+                      <Link to="/symptoms">
+                        <button className="flex items-center space-x-2 bg-[#1D6FA3] text-white px-4 py-2 rounded-lg hover:bg-[#1D6FA3]/80 transition-colors">
+                          <Plus className="w-4 h-4" />
+                          <span>Book New</span>
+                        </button>
+                      </Link>
                     </div>
 
                     <div className="space-y-4">
@@ -241,9 +277,6 @@ const Dashboard: React.FC = () => {
                             
                             <div className="flex items-center space-x-2">
                               <button className="p-2 text-gray-400 hover:text-blue-600 transition-colors">
-                                <Phone className="w-4 h-4" />
-                              </button>
-                              <button className="p-2 text-gray-400 hover:text-blue-600 transition-colors">
                                 <ChevronRight className="w-4 h-4" />
                               </button>
                             </div>
@@ -259,10 +292,10 @@ const Dashboard: React.FC = () => {
                   <div>
                     <div className="flex items-center justify-between mb-6">
                       <h2 className="text-xl font-bold text-gray-900">Appointment History</h2>
-                      <button className="flex items-center space-x-2 border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors">
+                      {/* <button className="flex items-center space-x-2 border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors">
                         <Filter className="w-4 h-4" />
                         <span>Filter</span>
-                      </button>
+                      </button> */}
                     </div>
 
                     <div className="space-y-4">
@@ -313,38 +346,38 @@ const Dashboard: React.FC = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                            <input 
-                              type="text" 
-                              value={user?.name || ''} 
+                            <input
+                              type="text"
+                              value={profile.name}
+                              onChange={(e) => setProfile({ ...profile, name: e.target.value })}
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                              readOnly
                             />
                           </div>
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                            <input 
-                              type="email" 
-                              value={user?.email || ''} 
+                            <input
+                              type="email"
+                              value={profile.email}
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                               readOnly
                             />
                           </div>
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-                            <input 
-                              type="tel" 
-                              value={user?.phone || ''} 
+                            <input
+                              type="tel"
+                              value={profile.phone}
+                              onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                              readOnly
                             />
                           </div>
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
-                            <input 
-                              type="text" 
-                              value={user?.location.address || ''} 
+                            <input
+                              type="text"
+                              value={profile.location}
+                              onChange={(e) => setProfile({ ...profile, location: e.target.value })}
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                              readOnly
                             />
                           </div>
                         </div>
@@ -355,20 +388,20 @@ const Dashboard: React.FC = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Provider</label>
-                            <input 
-                              type="text" 
-                              value={user?.insurance.provider || ''} 
+                            <input
+                              type="text"
+                              value={profile.insuranceProvider}
+                              onChange={(e) => setProfile({ ...profile, insuranceProvider: e.target.value })}
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                              readOnly
                             />
                           </div>
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Policy Number</label>
-                            <input 
-                              type="text" 
-                              value={user?.insurance.policyNumber || ''} 
+                            <input
+                              type="text"
+                              value={profile.policyNumber}
+                              onChange={(e) => setProfile({ ...profile, policyNumber: e.target.value })}
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                              readOnly
                             />
                           </div>
                         </div>
@@ -381,17 +414,18 @@ const Dashboard: React.FC = () => {
                             <input type="checkbox" className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" defaultChecked />
                             <span className="text-sm text-gray-700">Email appointment reminders</span>
                           </label>
-                          <label className="flex items-center space-x-3">
-                            <input type="checkbox" className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" defaultChecked />
-                            <span className="text-sm text-gray-700">SMS notifications</span>
-                          </label>
-                          <label className="flex items-center space-x-3">
-                            <input type="checkbox" className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
-                            <span className="text-sm text-gray-700">Marketing communications</span>
-                          </label>
                         </div>
                       </div>
-                    </div>
+
+                      <div className="text-right">
+                        <button
+                          onClick={handleSaveProfile}
+                          className="mt-4 bg-[#1D6FA3]/80 text-white px-4 py-2 rounded-lg hover:bg-[#1D6FA3] transition-colors"
+                        >
+                          Save Changes
+                        </button>
+                      </div>
+                      </div>
                   </div>
                 )}
               </div>
@@ -421,9 +455,9 @@ const Dashboard: React.FC = () => {
                       <span className="text-sm text-gray-600">{upcomingAppointments[0].clinicName}</span>
                     </div>
                   </div>
-                  <button className="w-full mt-4 bg-[#1D6FA3]/80 text-white py-2 rounded-lg hover:bg-[#1D6FA3] transition-colors">
+                  {/* <button className="w-full mt-4 bg-[#1D6FA3]/80 text-white py-2 rounded-lg hover:bg-[#1D6FA3] transition-colors">
                     View Details
-                  </button>
+                  </button> */}
                 </div>
               )}
 
@@ -431,17 +465,15 @@ const Dashboard: React.FC = () => {
               <div className="bg-white rounded-xl shadow-sm p-6">
                 <h3 className="font-semibold text-gray-900 mb-4">Quick Actions</h3>
                 <div className="space-y-3">
-                  <button className="w-full flex items-center space-x-3 p-3 text-left border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-                    <Plus className="w-5 h-5 text-[#1D6FA3]" />
-                    <span className="text-sm font-medium text-gray-900">Book Appointment</span>
-                  </button>
+                  <Link to="/symptoms">
+                    <button className="w-full flex items-center space-x-3 p-3 text-left border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                      <Plus className="w-5 h-5 text-[#1D6FA3]" />
+                      <span className="text-sm font-medium text-gray-900">Book Appointment</span>
+                    </button>
+                  </Link>
                   <button className="w-full flex items-center space-x-3 p-3 text-left border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
                     <FileText className="w-5 h-5 text-green-600" />
                     <span className="text-sm font-medium text-gray-900">View Records</span>
-                  </button>
-                  <button className="w-full flex items-center space-x-3 p-3 text-left border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-                    <Bell className="w-5 h-5 text-orange-600" />
-                    <span className="text-sm font-medium text-gray-900">Notifications</span>
                   </button>
                 </div>
               </div>

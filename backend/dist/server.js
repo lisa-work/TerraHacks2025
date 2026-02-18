@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.io = void 0;
+require("./config/env");
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const helmet_1 = __importDefault(require("helmet"));
@@ -12,12 +13,11 @@ const morgan_1 = __importDefault(require("morgan"));
 const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
 const http_1 = require("http");
 const socket_io_1 = require("socket.io");
-const dotenv_1 = __importDefault(require("dotenv"));
-const path_1 = __importDefault(require("path"));
 const database_1 = require("./config/database");
 const redis_1 = require("./config/redis");
 const errorHandler_1 = require("./middleware/errorHandler");
 const notFoundHandler_1 = require("./middleware/notFoundHandler");
+const seedData_1 = require("./utils/seedData");
 const auth_1 = __importDefault(require("./routes/auth"));
 const user_1 = __importDefault(require("./routes/user"));
 const clinic_1 = __importDefault(require("./routes/clinic"));
@@ -25,10 +25,12 @@ const appointment_1 = __importDefault(require("./routes/appointment"));
 const triage_1 = __importDefault(require("./routes/triage"));
 const medicalHistory_1 = __importDefault(require("./routes/medicalHistory"));
 const notification_1 = __importDefault(require("./routes/notification"));
-dotenv_1.default.config({ path: path_1.default.resolve(__dirname, '../.env') });
+const insurance_1 = __importDefault(require("./routes/insurance"));
+const upload_1 = __importDefault(require("./routes/upload"));
+const location_1 = __importDefault(require("./routes/location"));
 const googleMapsApiKey = process.env.GOOGLE_MAPS_API_KEY;
 if (googleMapsApiKey) {
-    console.log('GOOGLE_MAPS_API_KEY loaded');
+    console.log('✅ GOOGLE_MAPS_API_KEY loaded');
 }
 else {
     console.warn('GOOGLE_MAPS_API_KEY environment variable is not set. Maps features will be disabled.');
@@ -74,6 +76,9 @@ app.use('/api/appointments', appointment_1.default);
 app.use('/api/triage', triage_1.default);
 app.use('/api/medical-history', medicalHistory_1.default);
 app.use('/api/notifications', notification_1.default);
+app.use('/api/insurance', insurance_1.default);
+app.use('/api/upload', upload_1.default);
+app.use('/api/location', location_1.default);
 io.on('connection', (socket) => {
     console.log('User connected:', socket.id);
     socket.on('join-user-room', (userId) => {
@@ -91,6 +96,7 @@ const startServer = async () => {
     try {
         await (0, database_1.connectDatabase)();
         await (0, redis_1.connectRedis)();
+        await (0, seedData_1.seedInsuranceProviders)();
         const environment = process.env.NODE_ENV || 'development';
         const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
         server.listen(PORT, () => {

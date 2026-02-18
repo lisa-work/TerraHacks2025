@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  AlertTriangle, 
-  Phone, 
-  MapPin, 
-  Navigation, 
-  Clock, 
+import {
+  AlertTriangle,
+  Phone,
+  MapPin,
+  Navigation,
+  Clock,
   Heart,
   Zap,
   Car,
   Shield,
   ChevronRight
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
 
 interface EmergencyFacility {
   id: string;
@@ -27,59 +30,49 @@ interface EmergencyFacility {
 const EmergencyMode: React.FC = () => {
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [locationError, setLocationError] = useState<string | null>(null);
-  const [emergencyFacilities] = useState<EmergencyFacility[]>([
-    {
-      id: '1',
-      name: 'Manhattan General Hospital ER',
-      type: 'hospital',
-      address: '123 Medical Center Dr, New York, NY 10001',
-      phone: '+1-555-0101',
-      distance: 1.2,
-      eta: 8,
-      availability: 'medium',
-      specialties: ['Emergency Medicine', 'Trauma', 'Cardiology']
-    },
-    {
-      id: '2',
-      name: 'NYC Emergency Medical Center',
-      type: 'hospital',
-      address: '456 Emergency Ave, New York, NY 10002',
-      phone: '+1-555-0102',
-      distance: 2.1,
-      eta: 12,
-      availability: 'high',
-      specialties: ['Emergency Medicine', 'Pediatric Emergency', 'Neurology']
-    },
-    {
-      id: '3',
-      name: 'CityMed Urgent Care',
-      type: 'urgent_care',
-      address: '789 Health Plaza, New York, NY 10003',
-      phone: '+1-555-0103',
-      distance: 0.8,
-      eta: 5,
-      availability: 'high',
-      specialties: ['Urgent Care', 'Minor Emergency', 'X-Ray']
-    }
-  ]);
+  const [emergencyFacilities, setEmergencyFacilities] = useState<EmergencyFacility[]>([]);
 
   useEffect(() => {
+    const fallback = { lat: 43.6532, lng: -79.3832 }; // Toronto, ON
+
+    const fetchFacilities = async (coords: { lat: number; lng: number }) => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/location/emergency?lat=${coords.lat}&lng=${coords.lng}`);
+        if (!response.ok) {
+          console.error('Emergency facilities request failed:', response.status);
+          return;
+        }
+        const data = await response.json();
+        if (data.success) {
+          setEmergencyFacilities(data.facilities);
+        }
+      } catch (err) {
+        console.error('Failed to fetch emergency facilities', err);
+      }
+    };
+
     // Get user's current location
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setUserLocation({
+        async (position) => {
+          const coords = {
             lat: position.coords.latitude,
             lng: position.coords.longitude
-          });
+          };
+          setUserLocation(coords);
+          fetchFacilities(coords);
         },
         (error) => {
-          setLocationError('Unable to get your location. Using default location.');
+          setLocationError('Unable to get your location.');
           console.error('Geolocation error:', error);
+          setUserLocation(fallback);
+          fetchFacilities(fallback);
         }
       );
     } else {
       setLocationError('Geolocation is not supported by this browser.');
+      setUserLocation(fallback);
+      fetchFacilities(fallback);
     }
   }, []);
 
@@ -147,17 +140,18 @@ const EmergencyMode: React.FC = () => {
               <Phone className="w-6 h-6" />
               <span>Call 911</span>
             </button>
+
+            <a href="https://www.ontariopoisoncentre.ca/about-us/contact-us/" target="_blank" rel="noopener noreferrer" className="w-full">
+              <button
+                className="flex w-full items-center justify-center space-x-3 bg-orange-600 text-white p-4 rounded-lg hover:bg-orange-700 transition-colors font-semibold"
+              >
+                <Shield className="w-6 h-6" />
+                <span>Poison Control</span>
+              </button>
+            </a>
             
             <button
-              onClick={() => callFacility('+1-555-POISON')}
-              className="flex items-center justify-center space-x-3 bg-orange-600 text-white p-4 rounded-lg hover:bg-orange-700 transition-colors font-semibold"
-            >
-              <Shield className="w-6 h-6" />
-              <span>Poison Control</span>
-            </button>
-            
-            <button
-              onClick={() => window.open('https://www.redcross.org/get-help/how-to-prepare-for-emergencies/mobile-apps', '_blank')}
+              onClick={() => window.open('https://www.redcross.org/take-a-class/first-aid/performing-first-aid/first-aid-steps?srsltid=AfmBOopFHlECoY3kCa1D5MjWRc2TpwJuhyDhkM-c0ITlMjX62pU-GGXU', '_blank')}
               className="flex items-center justify-center space-x-3 bg-[#1D6FA3] text-white p-4 rounded-lg hover:bg-[#1D6FA3]/80 transition-colors font-semibold"
             >
               <Heart className="w-6 h-6" />
@@ -181,7 +175,7 @@ const EmergencyMode: React.FC = () => {
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold text-gray-900">Nearest Emergency Care</h2>
             <div className="text-sm text-gray-600">
-              {userLocation ? 'Based on your location' : 'Default location: New York, NY'}
+              {userLocation ? 'Based on your location' : 'Waiting for location...'}
             </div>
           </div>
 
@@ -218,19 +212,21 @@ const EmergencyMode: React.FC = () => {
                         </div>
                       </div>
 
-                      <div className="mb-4">
-                        <h4 className="text-sm font-medium text-gray-700 mb-2">Specialties:</h4>
-                        <div className="flex flex-wrap gap-2">
-                          {facility.specialties.map((specialty, index) => (
-                            <span 
-                              key={index}
-                              className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full"
-                            >
-                              {specialty}
-                            </span>
-                          ))}
+                      {facility.specialties.length > 0 && (
+                        <div className="mb-4">
+                          <h4 className="text-sm font-medium text-gray-700 mb-2">Specialties:</h4>
+                          <div className="flex flex-wrap gap-2">
+                            {facility.specialties.map((specialty, index) => (
+                              <span
+                                key={index}
+                                className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full"
+                              >
+                                {specialty}
+                              </span>
+                            ))}
+                          </div>
                         </div>
-                      </div>
+                      )}
                     </div>
                   </div>
 

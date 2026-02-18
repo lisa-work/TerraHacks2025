@@ -1,3 +1,4 @@
+import '../config/env';
 import { Client } from '@googlemaps/google-maps-services-js';
 
 interface LocationData {
