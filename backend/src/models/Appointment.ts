@@ -3,6 +3,8 @@ import mongoose, { Document, Schema } from 'mongoose';
 export interface IAppointment extends Document {
   user: mongoose.Types.ObjectId;
   clinic: mongoose.Types.ObjectId;
+  clinicName: string;
+  clinicAddress: string;
   appointmentDate: Date;
   appointmentTime: string;
   duration: number; // in minutes
@@ -59,6 +61,16 @@ const AppointmentSchema = new Schema<IAppointment>({
     type: Schema.Types.ObjectId,
     ref: 'Clinic',
     required: [true, 'Clinic is required']
+  },
+  clinicName: {
+    type: String,
+    required: [true, 'Clinic name is required'],
+    trim: true
+  },
+  clinicAddress: {
+    type: String,
+    required: [true, 'Clinic address is required'],
+    trim: true
   },
   appointmentDate: {
     type: Date,

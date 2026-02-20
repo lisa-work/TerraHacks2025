@@ -5,7 +5,7 @@ import { AuthRequest } from '../middleware/auth';
 
 export const createAppointment = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
-    const { clinicId, appointmentDate, appointmentTime, type, notes } = req.body;
+    const { clinicId, clinicName, clinicAddress, appointmentDate, appointmentTime, type, notes } = req.body;
 
     const clinicObjectId = mongoose.Types.ObjectId.isValid(clinicId)
       ? new mongoose.Types.ObjectId(clinicId)
@@ -14,6 +14,8 @@ export const createAppointment = async (req: AuthRequest, res: Response, next: N
     const appointment = await Appointment.create({
       user: req.user!._id,
       clinic: clinicObjectId,
+      clinicName,
+      clinicAddress,
       appointmentDate,
       appointmentTime,
       duration: 30,
@@ -35,6 +37,15 @@ export const createAppointment = async (req: AuthRequest, res: Response, next: N
     });
 
     res.status(201).json({ success: true, data: appointment });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getAppointments = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const appointments = await Appointment.find({ user: req.user!._id }).sort({ appointmentDate: 1, appointmentTime: 1 });
+    res.status(200).json({ success: true, data: appointments });
   } catch (error) {
     next(error);
   }
